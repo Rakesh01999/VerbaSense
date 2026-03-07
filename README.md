@@ -1,4 +1,4 @@
 ## VerbaSense
 
 ### Voice to text
-Backend 
+Backend + Frontend
