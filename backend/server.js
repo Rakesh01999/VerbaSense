@@ -23,15 +23,19 @@ app.get('/', (req, res) => {
 });
 
 // Database connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27014/verbasense', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => {
-  console.log('Successfully connected to MongoDB.');
-  app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+const MONGODB_URI = process.env.MONGODB_URI;
+
+if (!MONGODB_URI || MONGODB_URI.includes('<db_password>')) {
+  console.warn('WARNING: MongoDB URI is not fully configured. Please update .env with your credentials.');
+}
+
+mongoose.connect(MONGODB_URI)
+  .then(() => {
+    console.log('Successfully connected to MongoDB Atlas.');
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  }).catch(err => {
+    console.error('MongoDB connection error:', err);
+    process.exit(1);
   });
-}).catch(err => {
-  console.error('Connection error', err);
-  process.exit();
-});
