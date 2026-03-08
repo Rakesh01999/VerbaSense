@@ -1,63 +1,46 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
-const User_1 = __importDefault(require("../models/User"));
+const authController = __importStar(require("../controllers/authController"));
 const router = express_1.default.Router();
 // @route   POST api/auth/register
-// @desc    Register user
-// @access  Public
-router.post('/register', async (req, res) => {
-    const { name, email, password } = req.body;
-    try {
-        let user = await User_1.default.findOne({ email });
-        if (user) {
-            return res.status(400).json({ msg: 'User already exists' });
-        }
-        user = new User_1.default({ name, email, password });
-        await user.save();
-        const payload = { user: { id: user.id } };
-        const secret = process.env.JWT_SECRET || 'secret';
-        jsonwebtoken_1.default.sign(payload, secret, { expiresIn: 3600 }, (err, token) => {
-            if (err)
-                throw err;
-            res.json({ token });
-        });
-    }
-    catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
-    }
-});
+router.post('/register', authController.register);
 // @route   POST api/auth/login
-// @desc    Authenticate user & get token
-// @access  Public
-router.post('/login', async (req, res) => {
-    const { email, password } = req.body;
-    try {
-        let user = await User_1.default.findOne({ email });
-        if (!user) {
-            return res.status(400).json({ msg: 'Invalid Credentials' });
-        }
-        const isMatch = await bcryptjs_1.default.compare(password, user.password);
-        if (!isMatch) {
-            return res.status(400).json({ msg: 'Invalid Credentials' });
-        }
-        const payload = { user: { id: user.id } };
-        const secret = process.env.JWT_SECRET || 'secret';
-        jsonwebtoken_1.default.sign(payload, secret, { expiresIn: 3600 }, (err, token) => {
-            if (err)
-                throw err;
-            res.json({ token });
-        });
-    }
-    catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
-    }
-});
+router.post('/login', authController.login);
 exports.default = router;

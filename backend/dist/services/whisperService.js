@@ -7,12 +7,11 @@ exports.transcribeAudio = void 0;
 const child_process_1 = require("child_process");
 const path_1 = __importDefault(require("path"));
 const fs_1 = __importDefault(require("fs"));
-const WHISPER_PATH = process.env.WHISPER_PATH || path_1.default.join(__dirname, '../bin/main.exe');
-const MODEL_PATH = process.env.MODEL_PATH || path_1.default.join(__dirname, '../bin/ggml-base.en.bin');
+const WHISPER_PATH = process.env.WHISPER_PATH || path_1.default.join(__dirname, '../../bin/main.exe');
+const MODEL_PATH = process.env.MODEL_PATH || path_1.default.join(__dirname, '../../bin/ggml-base.en.bin');
 const transcribeAudio = (audioPath) => {
     return new Promise((resolve, reject) => {
         if (!fs_1.default.existsSync(WHISPER_PATH)) {
-            // Mock for now if binary is missing, but log a warning
             console.warn(`Whisper binary not found at ${WHISPER_PATH}. Using mock transcription.`);
             return setTimeout(() => resolve("This is a mock transcription because the whisper.cpp binary was not found. Please build whisper.cpp and place the executable in the bin folder."), 2000);
         }

@@ -1,4 +1,37 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || (function () {
+    var ownKeys = function(o) {
+        ownKeys = Object.getOwnPropertyNames || function (o) {
+            var ar = [];
+            for (var k in o) if (Object.prototype.hasOwnProperty.call(o, k)) ar[ar.length] = k;
+            return ar;
+        };
+        return ownKeys(o);
+    };
+    return function (mod) {
+        if (mod && mod.__esModule) return mod;
+        var result = {};
+        if (mod != null) for (var k = ownKeys(mod), i = 0; i < k.length; i++) if (k[i] !== "default") __createBinding(result, mod, k[i]);
+        __setModuleDefault(result, mod);
+        return result;
+    };
+})();
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,8 +40,7 @@ const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
 const path_1 = __importDefault(require("path"));
 const auth_1 = __importDefault(require("../middleware/auth"));
-const whisperService_1 = require("../services/whisperService");
-const Transcription_1 = __importDefault(require("../models/Transcription"));
+const transcribeController = __importStar(require("../controllers/transcribeController"));
 const router = express_1.default.Router();
 // Configure Multer for audio uploads
 const storage = multer_1.default.diskStorage({
@@ -29,47 +61,8 @@ const upload = (0, multer_1.default)({
         cb(null, true);
     }
 });
-// @route   POST api/transcribe
-// @desc    Upload audio and transcribe
-// @access  Private
-router.post('/', [auth_1.default, upload.single('audio')], async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ msg: 'Please upload an audio file' });
-    }
-    try {
-        const audioPath = req.file.path;
-        const transcribedText = await (0, whisperService_1.transcribeAudio)(audioPath);
-        const newTranscription = new Transcription_1.default({
-            user: req.user?.id || req.user, // Handle potential difference in payload structure
-            audioUrl: audioPath,
-            transcribedText,
-            language: 'en', // Default or detected
-            metadata: {
-                size: req.file.size,
-                format: req.file.mimetype
-            }
-        });
-        const transcription = await newTranscription.save();
-        res.json(transcription);
-    }
-    catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error during transcription');
-    }
-});
-// @route   GET api/transcribe/history
-// @desc    Get user's transcription history
-// @access  Private
-router.get('/history', auth_1.default, async (req, res) => {
-    try {
-        const history = await Transcription_1.default.find({
-            user: req.user?.id || req.user
-        }).sort({ createdAt: -1 });
-        res.json(history);
-    }
-    catch (err) {
-        console.error(err.message);
-        res.status(500).send('Server error');
-    }
-});
+// @route   POST api/transcribe - Upload audio and transcribe
+router.post('/', [auth_1.default, upload.single('audio')], transcribeController.uploadAndTranscribe);
+// @route   GET api/transcribe/history - Get user's transcription history
+router.get('/history', auth_1.default, transcribeController.getHistory);
 exports.default = router;
