@@ -9,4 +9,7 @@ router.post('/register', authController.register);
 // @route   POST api/auth/login
 router.post('/login', authController.login);
 
+// @route   GET api/auth/users
+router.get('/users', authController.getAllUsers);
+
 export default router;

@@ -56,3 +56,15 @@ export const login = catchAsync(async (req: Request, res: Response) => {
         });
     });
 });
+
+export const getAllUsers = catchAsync(async (req: Request, res: Response) => {
+    const users = await User.find().select('-password');
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Users retrieved successfully',
+        data: users
+    });
+});
+
