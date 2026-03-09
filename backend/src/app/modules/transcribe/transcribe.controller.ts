@@ -3,6 +3,7 @@ import { AuthRequest } from '../../middlewares/auth';
 import { transcribeAudio } from './transcribe.service';
 import Transcription from './transcribe.model';
 import catchAsync from '../../../shared/catchAsync';
+import sendResponse from '../../utils/sendResponse';
 
 export const uploadAndTranscribe = catchAsync(async (req: AuthRequest, res: Response) => {
     if (!req.file) {
@@ -24,12 +25,24 @@ export const uploadAndTranscribe = catchAsync(async (req: AuthRequest, res: Resp
     });
 
     const transcription = await newTranscription.save();
-    res.json(transcription);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Transcription completed successfully',
+        data: transcription
+    });
 });
 
 export const getHistory = catchAsync(async (req: AuthRequest, res: Response) => {
     const history = await Transcription.find({
         user: (req.user as any)?.id || req.user
     }).sort({ createdAt: -1 });
-    res.json(history);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Transcription history retrieved successfully',
+        data: history
+    });
 });
