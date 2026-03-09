@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import path from 'path';
 import connectDB from './app/config/db';
 import router from './app/routes';
+import globalErrorHandler from './app/middlewares/globalErrorHandler';
+import notFound from './app/middlewares/notFound';
 
 dotenv.config();
 
@@ -24,6 +26,12 @@ app.use('/api', router);
 app.get('/', (req: Request, res: Response) => {
     res.send('VerbaSense API is running ...');
 });
+
+// Error handling Middlewares
+app.use(globalErrorHandler);
+
+// Not Found
+app.use(notFound);
 
 if (process.env.NODE_ENV !== 'test') {
     app.listen(PORT, () => {
