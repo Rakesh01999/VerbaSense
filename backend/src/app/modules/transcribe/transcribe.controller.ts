@@ -1,7 +1,7 @@
 import { Response } from 'express';
-import { AuthRequest } from '../middleware/auth';
-import { transcribeAudio } from '../services/whisperService';
-import Transcription from '../models/Transcription';
+import { AuthRequest } from '../../middlewares/auth';
+import { transcribeAudio } from './transcribe.service';
+import Transcription from './transcribe.model';
 
 export const uploadAndTranscribe = async (req: AuthRequest, res: Response) => {
     if (!req.file) {

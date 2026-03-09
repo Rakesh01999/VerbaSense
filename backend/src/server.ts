@@ -2,11 +2,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import path from 'path';
-import connectDB from './config/db';
-
-// Import routes
-import authRoutes from './routes/auth';
-import transcribeRoutes from './routes/transcribe';
+import connectDB from './app/config/db';
+import router from './app/routes';
 
 dotenv.config();
 
@@ -21,12 +18,11 @@ app.use(cors());
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, '../uploads'))); // Adjust path for uploads
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/transcribe', transcribeRoutes);
+// API Routes
+app.use('/api', router);
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('VerbaSense API is running...');
+    res.send('VerbaSense API is running in professional modular structure...');
 });
 
 if (process.env.NODE_ENV !== 'test') {

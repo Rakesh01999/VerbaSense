@@ -1,8 +1,8 @@
 import express from 'express';
 import multer from 'multer';
 import path from 'path';
-import auth from '../middleware/auth';
-import * as transcribeController from '../controllers/transcribeController';
+import auth from '../../middlewares/auth';
+import * as transcribeController from './transcribe.controller';
 
 const router = express.Router();
 
