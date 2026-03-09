@@ -22,7 +22,7 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads'))); // Adju
 app.use('/api', router);
 
 app.get('/', (req: Request, res: Response) => {
-    res.send('VerbaSense API is running in professional modular structure...');
+    res.send('VerbaSense API is running ...');
 });
 
 if (process.env.NODE_ENV !== 'test') {
