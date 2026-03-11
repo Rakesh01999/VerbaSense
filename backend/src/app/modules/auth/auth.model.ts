@@ -8,6 +8,8 @@ export interface IUser extends Document {
     date: Date;
     isVerified: boolean;
     verificationToken?: string;
+    resetPasswordToken?: string;
+    resetPasswordExpires?: Date;
 }
 
 const UserSchema: Schema = new Schema({
@@ -34,6 +36,12 @@ const UserSchema: Schema = new Schema({
     },
     verificationToken: {
         type: String
+    },
+    resetPasswordToken: {
+        type: String
+    },
+    resetPasswordExpires: {
+        type: Date
     }
 });
 

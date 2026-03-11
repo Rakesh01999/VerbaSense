@@ -15,4 +15,10 @@ router.get('/users', authController.getAllUsers);
 // @route   GET api/auth/verify-email/:token
 router.get('/verify-email/:token', authController.verifyEmail);
 
+// @route   POST api/auth/forgot-password
+router.post('/forgot-password', authController.forgotPassword);
+
+// @route   POST api/auth/reset-password/:token
+router.post('/reset-password/:token', authController.resetPassword);
+
 export default router;

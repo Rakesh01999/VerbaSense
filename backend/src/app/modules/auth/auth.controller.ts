@@ -1,11 +1,12 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
+import crypto from 'crypto';
 import User from './auth.model';
 import catchAsync from '../../../shared/catchAsync';
 import AppError from '../../errors/AppError';
 import sendResponse from '../../utils/sendResponse';
-import { sendEmail } from '../../utils/sendEmail';
+import { sendEmail, sendPasswordResetEmail } from '../../utils/sendEmail';
 import { v4 as uuidv4 } from 'uuid';
 
 export const register = catchAsync(async (req: Request, res: Response) => {
@@ -104,4 +105,87 @@ export const verifyEmail = catchAsync(async (req: Request, res: Response) => {
             </body>
         </html>
     `);
+});
+
+// @desc    Forgot Password - send reset email
+export const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+    const { email } = req.body;
+
+    if (!email) {
+        throw new AppError(400, 'Please provide an email address');
+    }
+
+    const user = await User.findOne({ email });
+
+    // Always respond generically to prevent email enumeration
+    if (!user) {
+        sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: 'If an account with that email exists, a password reset link has been sent.',
+            data: null
+        });
+        return;
+    }
+
+    // Generate a secure random token
+    const rawToken = crypto.randomBytes(32).toString('hex');
+
+    // Store the hashed version in the DB (never store raw token)
+    const hashedToken = crypto.createHash('sha256').update(rawToken).digest('hex');
+    user.resetPasswordToken = hashedToken;
+    user.resetPasswordExpires = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
+
+    await user.save();
+
+    // Send email with the raw token in the link
+    const resetLink = `${req.protocol}://${req.get('host')}/api/auth/reset-password/${rawToken}`;
+    await sendPasswordResetEmail(user.email, resetLink);
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'If an account with that email exists, a password reset link has been sent.',
+        data: null
+    });
+});
+
+// @desc    Reset Password - update password using token from email
+export const resetPassword = catchAsync(async (req: Request, res: Response) => {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!token || !password) {
+        throw new AppError(400, 'Token and new password are required');
+    }
+
+    if (password.length < 6) {
+        throw new AppError(400, 'Password must be at least 6 characters long');
+    }
+
+    // Hash the incoming raw token to compare with what's in DB
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+    const user = await User.findOne({
+        resetPasswordToken: hashedToken,
+        resetPasswordExpires: { $gt: new Date() } // token must not be expired
+    });
+
+    if (!user) {
+        throw new AppError(400, 'Password reset token is invalid or has expired');
+    }
+
+    // Update password (pre-save hook will hash it)
+    user.password = password;
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpires = undefined;
+
+    await user.save();
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Password has been reset successfully. You can now log in with your new password.',
+        data: null
+    });
 });
