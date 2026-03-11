@@ -1,4 +1,4 @@
-Here's a complete guide on how the forgot password flow works and how to test it in Postman.
+Complete guide on how the forgot password flow works and how to test it in Postman.
 
 ---
 
