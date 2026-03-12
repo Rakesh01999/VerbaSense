@@ -1,0 +1,10 @@
+93b3ba5 google auth
+7f2915e google auth
+e522131 Add authentication (Google Auth added) model and install new dependencies.
+aab04f5 .md file updated
+cf14ad7 Added a comprehensive guide for the forgot password flow, covering its implementation details and Postman testing instructions.
+898eb90 forgot password doc
+d44ae63 Merge branch 'main' of https://github.com/Rakesh01999/VerbaSense
+c33fd6d Implemented user authentication with registration, login, email verification, and password reset functionalities.
+cb16d26 Update README.md
+cea70cc Update README.md
