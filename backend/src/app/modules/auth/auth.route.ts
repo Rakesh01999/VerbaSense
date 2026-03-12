@@ -9,8 +9,11 @@ router.post('/register', authController.register);
 // @route   POST api/auth/login
 router.post('/login', authController.login);
 
-// @route   GET api/auth/users
+// @route   POST api/auth/users
 router.get('/users', authController.getAllUsers);
+
+// @route   POST api/auth/google-login
+router.post('/google-login', authController.googleLogin);
 
 // @route   GET api/auth/verify-email/:token
 router.get('/verify-email/:token', authController.verifyEmail);

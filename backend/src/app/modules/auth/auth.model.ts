@@ -4,7 +4,8 @@ import bcrypt from 'bcryptjs';
 export interface IUser extends Document {
     name: string;
     email: string;
-    password: string;
+    password?: string;
+    googleId?: string;
     date: Date;
     isVerified: boolean;
     verificationToken?: string;
@@ -24,7 +25,12 @@ const UserSchema: Schema = new Schema({
     },
     password: {
         type: String,
-        required: true
+        required: false
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true
     },
     date: {
         type: Date,
@@ -47,7 +53,7 @@ const UserSchema: Schema = new Schema({
 
 // Hash password before saving
 UserSchema.pre<IUser>('save', async function (next) {
-    if (!this.isModified('password')) return next();
+    if (!this.password || !this.isModified('password')) return next();
     const salt = await bcrypt.genSalt(10);
     this.password = await bcrypt.hash(this.password, salt);
     next();

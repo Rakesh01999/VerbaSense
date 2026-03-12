@@ -1,4 +1,5 @@
 import { Request, Response } from 'express';
+import { OAuth2Client } from 'google-auth-library';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
@@ -8,6 +9,8 @@ import AppError from '../../errors/AppError';
 import sendResponse from '../../utils/sendResponse';
 import { sendEmail, sendPasswordResetEmail } from '../../utils/sendEmail';
 import { v4 as uuidv4 } from 'uuid';
+ 
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 export const register = catchAsync(async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
@@ -51,6 +54,10 @@ export const login = catchAsync(async (req: Request, res: Response) => {
 
     if (!user.isVerified) {
         throw new AppError(403, 'Please verify your email address to login.');
+    }
+
+    if (!user.password) {
+        throw new AppError(400, 'This account was created with Google. Please use Google Login.');
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -187,5 +194,60 @@ export const resetPassword = catchAsync(async (req: Request, res: Response) => {
         success: true,
         message: 'Password has been reset successfully. You can now log in with your new password.',
         data: null
+    });
+});
+
+export const googleLogin = catchAsync(async (req: Request, res: Response) => {
+    const { credential } = req.body;
+
+    if (!credential) {
+        throw new AppError(400, 'Google credential is required');
+    }
+
+    const ticket = await client.verifyIdToken({
+        idToken: credential,
+        audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    if (!payload || !payload.email) {
+        throw new AppError(400, 'Invalid Google token');
+    }
+
+    const { email, name, sub: googleId } = payload;
+
+    let user = await User.findOne({ email });
+
+    if (user) {
+        // If user exists but doesn't have a googleId, link it
+        if (!user.googleId) {
+            user.googleId = googleId;
+            // Also mark as verified if it was Google login
+            user.isVerified = true;
+            await user.save();
+        }
+    } else {
+        // Create new user
+        user = new User({
+            name,
+            email,
+            googleId,
+            isVerified: true, // Google accounts are implicitly verified
+        });
+        await user.save();
+    }
+
+    const jwtPayload = { user: { id: user.id } };
+    const secret = process.env.JWT_SECRET || 'secret';
+
+    jwt.sign(jwtPayload, secret, { expiresIn: '1h' }, (err, token) => {
+        if (err) throw err;
+
+        sendResponse(res, {
+            statusCode: 200,
+            success: true,
+            message: 'User logged in successfully with Google',
+            data: { token }
+        });
     });
 });

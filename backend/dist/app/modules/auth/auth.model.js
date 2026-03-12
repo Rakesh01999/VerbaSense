@@ -50,7 +50,12 @@ const UserSchema = new mongoose_1.Schema({
     },
     password: {
         type: String,
-        required: true
+        required: false
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true
     },
     date: {
         type: Date,
@@ -62,11 +67,17 @@ const UserSchema = new mongoose_1.Schema({
     },
     verificationToken: {
         type: String
+    },
+    resetPasswordToken: {
+        type: String
+    },
+    resetPasswordExpires: {
+        type: Date
     }
 });
 // Hash password before saving
 UserSchema.pre('save', async function (next) {
-    if (!this.isModified('password'))
+    if (!this.password || !this.isModified('password'))
         return next();
     const salt = await bcryptjs_1.default.genSalt(10);
     this.password = await bcryptjs_1.default.hash(this.password, salt);
