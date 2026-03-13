@@ -58,7 +58,7 @@ export default function Navbar() {
           <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20 group-hover:scale-110 transition-transform duration-300">
             <Mic className="text-white w-5 h-5" />
           </div>
-          <span className="text-xl font-bold tracking-tight text-white">
+          <span className="text-xl font-bold tracking-tight text-foreground">
             Verba<span className="text-purple-500">Sense</span>
           </span>
         </Link>
@@ -119,10 +119,10 @@ export default function Navbar() {
             </div>
           ) : (
             <>
-              <Button asChild variant="ghost" className="text-zinc-400 hover:text-white">
+              <Button asChild variant="ghost" className="text-muted-foreground hover:text-foreground">
                 <Link href="/login">Login</Link>
               </Button>
-              <Button asChild className="bg-white text-black hover:bg-zinc-200 rounded-full px-6">
+              <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6">
                 <Link href="/register">Get Started</Link>
               </Button>
             </>
@@ -131,7 +131,7 @@ export default function Navbar() {
 
         {/* Mobile Menu Toggle */}
         <button
-          className="md:hidden text-zinc-400 hover:text-white"
+          className="md:hidden text-muted-foreground hover:text-foreground"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
         >
           {mobileMenuOpen ? <X /> : <Menu />}
@@ -158,19 +158,19 @@ export default function Navbar() {
                 </Link>
               ))}
               <div className="flex items-center justify-between">
-                <span className="text-sm font-medium text-zinc-500 uppercase tracking-wider">Appearance</span>
+                <span className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Appearance</span>
                 <ThemeToggle />
               </div>
               <hr className="border-border" />
               {isAuthenticated ? (
                 <>
-                  <Link href="/dashboard" className="text-lg font-medium text-zinc-400">Dashboard</Link>
-                  <button onClick={logout} className="text-lg font-medium text-red-400 text-left">Logout</button>
+                  <Link href="/dashboard" className="text-lg font-medium text-muted-foreground">Dashboard</Link>
+                  <button onClick={logout} className="text-lg font-medium text-destructive text-left">Logout</button>
                 </>
               ) : (
                 <>
-                  <Link href="/login" className="text-lg font-medium text-zinc-400">Login</Link>
-                  <Link href="/register" className="text-lg font-medium text-white">Get Started</Link>
+                  <Link href="/login" className="text-lg font-medium text-muted-foreground">Login</Link>
+                  <Link href="/register" className="text-lg font-medium text-foreground">Get Started</Link>
                 </>
               )}
             </div>
