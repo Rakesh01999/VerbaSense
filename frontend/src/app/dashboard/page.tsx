@@ -186,7 +186,7 @@ export default function DashboardPage() {
                   </motion.p>
                 ) : (
                   <div className="h-full flex items-center justify-center text-muted-foreground italic">
-                    {isProcessing ? "Whisper AI is working..." : "Transcription will appear here..."}
+                    {isProcessing ? "Processing audio signal..." : "Transcription will appear here..."}
                   </div>
                 )}
               </CardContent>

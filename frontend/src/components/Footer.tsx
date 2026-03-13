@@ -48,7 +48,7 @@ export default function Footer() {
               </span>
             </Link>
             <p className="text-muted-foreground max-w-sm mb-8 leading-relaxed">
-              VerbaSense is an advanced AI-powered speech-to-text platform designed for developers and businesses who demand precision and speed.
+              VerbaSense is a professional speech-to-text platform designed for developers and businesses who demand precision and speed.
             </p>
             <div className="flex gap-4">
               <a href="#" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
@@ -86,7 +86,7 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-muted-foreground/60 text-sm">
-            © {currentYear} VerbaSense AI Systems Inc. All rights reserved.
+            © {currentYear} VerbaSense Systems Inc. All rights reserved.
           </p>
           <div className="flex items-center gap-6 text-muted-foreground/60 text-sm">
             <div className="flex items-center gap-2">

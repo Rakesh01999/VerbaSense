@@ -23,7 +23,7 @@ export default function Home() {
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-secondary border border-border text-muted-foreground text-sm font-medium mb-8 backdrop-blur-md"
         >
           <Sparkles className="w-4 h-4 text-purple-400" />
-          <span>New: Real-time Whisper v3 integration</span>
+          <span>New: High-fidelity transcription engine</span>
         </motion.div>
 
         {/* Hero Title */}
@@ -35,7 +35,7 @@ export default function Home() {
         >
           Transform Your Voice into <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 px-2 pb-1">
-            Digital Intelligence
+            Precision Transcription
           </span>
         </motion.h1>
 
@@ -46,8 +46,8 @@ export default function Home() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-lg md:text-xl text-muted-foreground max-w-3xl mb-12 font-medium leading-relaxed"
         >
-          The most accurate AI-powered speech-to-text platform. 
-          Bridge the gap between voice and text with state-of-the-art neural networks.
+          The most accurate professional voice-to-text platform. 
+          Bridge the gap between voice and text with state-of-the-art recognition technology.
           Experience precision, speed, and privacy in one seamless interface.
         </motion.p>
 
@@ -75,20 +75,20 @@ export default function Home() {
           {[
             { 
               icon: <Zap className="w-6 h-6 text-yellow-500" />, 
-              title: "Instant Processing", 
-              desc: "Optimized Whisper weights for latency-sensitive applications and real-time streams.",
+              title: "Precision Recognition", 
+              desc: "High-accuracy transcription that captures every detail with pinpoint precision.",
               gradient: "from-yellow-500/10 to-transparent"
             },
             { 
               icon: <Shield className="w-6 h-6 text-blue-500" />, 
-              title: "Secure & Private", 
-              desc: "Enterprise-grade encryption for all audio data. Your transcripts never leave your control.",
+              title: "Secure Processing", 
+              desc: "Enterprise-grade security ensuring your voice data and transcripts remain private.",
               gradient: "from-blue-500/10 to-transparent"
             },
             { 
               icon: <Sparkles className="w-6 h-6 text-purple-500" />, 
-              title: "99% Accuracy", 
-              desc: "Supports 90+ languages with contextual understanding and speaker diarization.",
+              title: "Advanced Engine", 
+              desc: "Powered by state-of-the-art speech processing technology for instant results.",
               gradient: "from-purple-500/10 to-transparent"
             }
           ].map((feature, i) => (

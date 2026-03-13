@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "VerbaSense | AI Speech-to-Text",
-  description: "Advanced AI-powered speech recognition and transcription.",
+  title: "VerbaSense | Precision Voice-to-Text",
+  description: "Professional speech recognition and high-accuracy transcription services.",
 };
 
 export default function RootLayout({

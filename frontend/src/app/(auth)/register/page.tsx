@@ -34,7 +34,7 @@ export default function RegisterPage() {
             <Mic className="text-white w-8 h-8" />
           </div>
           <h1 className="text-4xl font-bold text-foreground tracking-tight">VerbaSense</h1>
-          <p className="text-muted-foreground mt-2">Join the future of transcription.</p>
+          <p className="text-muted-foreground mt-2">Professional voice-to-text services.</p>
         </div>
 
         <Card className="border-border bg-card/50 backdrop-blur-xl shadow-2xl">

@@ -33,7 +33,7 @@ export default function LoginPage() {
             <Mic className="text-white w-8 h-8" />
           </div>
           <h1 className="text-4xl font-bold text-foreground tracking-tight">VerbaSense</h1>
-          <p className="text-muted-foreground mt-2">Voice to text. Powered by AI.</p>
+          <p className="text-muted-foreground mt-2">Precision voice-to-text services.</p>
         </div>
 
         <Card className="border-border bg-card/50 backdrop-blur-xl shadow-2xl">
