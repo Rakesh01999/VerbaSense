@@ -37,32 +37,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
-const multer_1 = __importDefault(require("multer"));
-const path_1 = __importDefault(require("path"));
 const auth_1 = __importDefault(require("../../middlewares/auth"));
+const upload_1 = require("../../middlewares/upload");
 const transcribeController = __importStar(require("./transcribe.controller"));
 const router = express_1.default.Router();
-// Configure Multer for audio uploads
-const storage = multer_1.default.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, `${Date.now()}-${file.originalname}`);
-    }
-});
-const upload = (0, multer_1.default)({
-    storage,
-    fileFilter: (req, file, cb) => {
-        const ext = path_1.default.extname(file.originalname).toLowerCase();
-        if (ext !== '.wav' && ext !== '.mp3') {
-            return cb(new Error('Only .wav and .mp3 files are allowed'));
-        }
-        cb(null, true);
-    }
-});
 // @route   POST api/transcribe - Upload audio and transcribe
-router.post('/', [auth_1.default, upload.single('audio')], transcribeController.uploadAndTranscribe);
+router.post('/', [auth_1.default, upload_1.upload.single('audio')], transcribeController.uploadAndTranscribe);
 // @route   GET api/transcribe/history - Get user's transcription history
 router.get('/history', auth_1.default, transcribeController.getHistory);
 exports.default = router;
