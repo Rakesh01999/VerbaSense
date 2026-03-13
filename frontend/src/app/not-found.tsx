@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-background flex items-center justify-center p-6 relative overflow-hidden">
       {/* Background Decorative Elements */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute top-[30%] left-[20%] w-[300px] h-[300px] bg-blue-600/10 rounded-full blur-[100px] pointer-events-none" />
@@ -51,7 +51,7 @@ export default function NotFound() {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.2, duration: 0.5 }}
         >
-          <h1 className="text-7xl md:text-9xl font-black text-white tracking-tighter mb-4">
+          <h1 className="text-7xl md:text-9xl font-black text-foreground tracking-tighter mb-4">
             4<span className="text-purple-500">0</span>4
           </h1>
           <h2 className="text-2xl md:text-3xl font-bold text-foreground mb-6 uppercase tracking-widest">

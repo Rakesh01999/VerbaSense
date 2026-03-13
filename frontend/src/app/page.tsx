@@ -34,7 +34,7 @@ export default function Home() {
           className="text-5xl md:text-8xl font-black text-foreground tracking-tighter mb-8 leading-[1.1]"
         >
           Transform Your Voice into <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400">
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 via-blue-500 to-cyan-400 px-2 pb-1">
             Digital Intelligence
           </span>
         </motion.h1>
