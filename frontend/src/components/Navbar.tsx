@@ -7,6 +7,7 @@ import { Mic, Menu, X, User, LogOut, LayoutDashboard, ChevronDown } from "lucide
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/AuthContext"
 import { motion, AnimatePresence } from "framer-motion"
+import { ThemeToggle } from "@/components/ThemeToggle"
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth()
@@ -47,7 +48,7 @@ export default function Navbar() {
     <nav
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         isScrolled 
-          ? "py-3 bg-zinc-950/80 backdrop-blur-xl border-b border-white/10 shadow-lg" 
+          ? "py-3 bg-background/80 backdrop-blur-xl border-b border-border shadow-lg" 
           : "py-5 bg-transparent"
       }`}
     >
@@ -68,7 +69,7 @@ export default function Navbar() {
             <Link
               key={link.name}
               href={link.href}
-              className="text-sm font-medium text-zinc-400 hover:text-white transition-colors relative group"
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors relative group"
             >
               {link.name}
               <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-purple-500 transition-all duration-300 group-hover:w-full" />
@@ -78,13 +79,14 @@ export default function Navbar() {
 
         {/* Auth Actions */}
         <div className="hidden md:flex items-center gap-4">
+          <ThemeToggle />
           {isAuthenticated ? (
             <div className="relative">
               <button
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
-                className="flex items-center gap-2 p-1 pl-3 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors"
+                className="flex items-center gap-2 p-1 pl-3 rounded-full bg-secondary border border-border hover:bg-muted transition-colors"
               >
-                <span className="text-sm font-medium text-zinc-200">{user?.email?.split('@')[0]}</span>
+                <span className="text-sm font-medium text-foreground">{user?.email?.split('@')[0]}</span>
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-xs font-bold">
                   {user?.email?.[0].toUpperCase()}
                 </div>
@@ -97,11 +99,11 @@ export default function Navbar() {
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                    className="absolute right-0 mt-2 w-48 py-2 bg-zinc-900 border border-white/10 rounded-xl shadow-2xl backdrop-blur-xl"
+                    className="absolute right-0 mt-2 w-48 py-2 bg-popover border border-border rounded-xl shadow-2xl backdrop-blur-xl"
                   >
                     <Link
                       href="/dashboard"
-                      className="flex items-center gap-2 px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition-colors"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                     >
                       <LayoutDashboard className="w-4 h-4" /> Dashboard
                     </Link>
@@ -143,19 +145,23 @@ export default function Navbar() {
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            className="md:hidden bg-zinc-950 border-b border-white/10 overflow-hidden"
+            className="md:hidden bg-background border-b border-border overflow-hidden"
           >
             <div className="flex flex-col gap-4 p-6">
               {navLinks.map((link) => (
                 <Link
                   key={link.name}
                   href={link.href}
-                  className="text-lg font-medium text-zinc-400 hover:text-white"
+                  className="text-lg font-medium text-muted-foreground hover:text-foreground"
                 >
                   {link.name}
                 </Link>
               ))}
-              <hr className="border-white/5" />
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-medium text-zinc-500 uppercase tracking-wider">Appearance</span>
+                <ThemeToggle />
+              </div>
+              <hr className="border-border" />
               {isAuthenticated ? (
                 <>
                   <Link href="/dashboard" className="text-lg font-medium text-zinc-400">Dashboard</Link>

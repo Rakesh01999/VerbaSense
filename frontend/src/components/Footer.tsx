@@ -34,7 +34,7 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="bg-zinc-950 border-t border-white/5 pt-20 pb-10">
+    <footer className="bg-background border-t border-border pt-20 pb-10">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-12 mb-16">
           {/* Brand Column */}
@@ -47,17 +47,17 @@ export default function Footer() {
                 Verba<span className="text-purple-500">Sense</span>
               </span>
             </Link>
-            <p className="text-zinc-500 max-w-sm mb-8 leading-relaxed">
+            <p className="text-muted-foreground max-w-sm mb-8 leading-relaxed">
               VerbaSense is an advanced AI-powered speech-to-text platform designed for developers and businesses who demand precision and speed.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
+              <a href="#" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
+              <a href="#" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
                 <Twitter className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-zinc-400 hover:bg-white/10 hover:text-white transition-all">
+              <a href="#" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
                 <Linkedin className="w-5 h-5" />
               </a>
             </div>
@@ -72,7 +72,7 @@ export default function Footer() {
                   <li key={link.name}>
                     <Link
                       href={link.href}
-                      className="text-zinc-500 hover:text-purple-400 transition-colors"
+                      className="text-muted-foreground hover:text-primary transition-colors"
                     >
                       {link.name}
                     </Link>
@@ -84,11 +84,11 @@ export default function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-6">
-          <p className="text-zinc-600 text-sm">
+        <div className="pt-8 border-t border-border flex flex-col md:flex-row justify-between items-center gap-6">
+          <p className="text-muted-foreground/60 text-sm">
             © {currentYear} VerbaSense AI Systems Inc. All rights reserved.
           </p>
-          <div className="flex items-center gap-6 text-zinc-600 text-sm">
+          <div className="flex items-center gap-6 text-muted-foreground/60 text-sm">
             <div className="flex items-center gap-2">
               <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
               <span>System Status: Operational</span>

@@ -37,9 +37,9 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-white flex">
+    <div className="min-h-screen bg-background text-foreground flex">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-white/10 flex flex-col p-4 bg-zinc-900/20 backdrop-blur-md hidden md:flex">
+      <aside className="w-64 border-r border-border flex flex-col p-4 bg-muted/20 backdrop-blur-md hidden md:flex">
         <div className="flex items-center gap-2 mb-8 px-2">
           <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
             <Mic className="w-4 h-4 text-white" />
@@ -48,25 +48,25 @@ export default function DashboardPage() {
         </div>
 
         <nav className="flex-1 space-y-1">
-          <Button variant="ghost" className="w-full justify-start text-zinc-400 hover:text-white hover:bg-white/5">
+          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-accent/50">
             <Mic className="mr-2 w-4 h-4" /> Recorder
           </Button>
-          <Button variant="ghost" className="w-full justify-start text-zinc-400 hover:text-white hover:bg-white/5">
+          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-accent/50">
             <History className="mr-2 w-4 h-4" /> History
           </Button>
-          <Button variant="ghost" className="w-full justify-start text-zinc-400 hover:text-white hover:bg-white/5">
+          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-accent/50">
             <Settings className="mr-2 w-4 h-4" /> Settings
           </Button>
         </nav>
 
-        <div className="mt-auto pt-4 border-t border-white/10 space-y-2">
+        <div className="mt-auto pt-4 border-t border-border space-y-2">
           <div className="flex items-center gap-3 px-2 mb-4">
-            <div className="w-8 h-8 rounded-full bg-zinc-800 flex items-center justify-center">
-              <User className="w-4 h-4 text-zinc-400" />
+            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
+              <User className="w-4 h-4 text-muted-foreground" />
             </div>
             <div className="flex flex-col">
               <span className="text-sm font-medium truncate w-32">{user?.email?.split('@')[0]}</span>
-              <span className="text-xs text-zinc-500">Free Plan</span>
+              <span className="text-xs text-muted-foreground">Free Plan</span>
             </div>
           </div>
           <Button 
@@ -89,19 +89,19 @@ export default function DashboardPage() {
             <span className="font-bold text-xl">VerbaSense</span>
           </div>
           <Button variant="ghost" size="icon" onClick={logout}>
-            <LogOut className="w-5 h-5 text-zinc-400" />
+            <LogOut className="w-5 h-5 text-muted-foreground" />
           </Button>
         </header>
 
         <section className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
           <div className="mb-8">
             <h2 className="text-3xl font-bold mb-2">Speech-to-Text</h2>
-            <p className="text-zinc-500">Record your voice and let VerbaSense handle the rest.</p>
+            <p className="text-muted-foreground">Record your voice and let VerbaSense handle the rest.</p>
           </div>
 
           <div className="grid grid-cols-1 gap-6 flex-1">
             {/* Recording Area */}
-            <Card className="border-white/10 bg-zinc-900/50 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center relative overflow-hidden min-h-[400px]">
+            <Card className="border-border bg-card/50 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center relative overflow-hidden min-h-[400px]">
               {/* Background gradient pulses when recording */}
               <AnimatePresence>
                 {isRecording && (
@@ -140,7 +140,7 @@ export default function DashboardPage() {
                   <h3 className="text-xl font-semibold mb-1">
                     {isRecording ? "Recording..." : isProcessing ? "Processing Audio..." : "Start Recording"}
                   </h3>
-                  <p className="text-zinc-500">
+                  <p className="text-muted-foreground">
                     {isRecording ? "Tap to finish transcription" : "Your voice patterns will be processed securely"}
                   </p>
                 </div>
@@ -161,17 +161,17 @@ export default function DashboardPage() {
             </Card>
 
             {/* Result Area */}
-            <Card className="border-white/10 bg-zinc-900/50 backdrop-blur-xl flex flex-col">
+            <Card className="border-border bg-card/50 backdrop-blur-xl flex flex-col">
               <CardHeader className="flex flex-row items-center justify-between border-b border-white/5">
                 <div>
-                  <CardTitle className="text-sm uppercase tracking-wider text-zinc-500 font-bold">Transcription Result</CardTitle>
+                  <CardTitle className="text-sm uppercase tracking-wider text-muted-foreground font-bold">Transcription Result</CardTitle>
                 </div>
                 <div className="flex gap-2">
                   <Button variant="ghost" size="icon" onClick={copyToClipboard} title="Copy result">
-                    <Copy className="w-4 h-4 text-zinc-400" />
+                    <Copy className="w-4 h-4 text-muted-foreground" />
                   </Button>
                   <Button variant="ghost" size="icon" onClick={clearTranscription} title="Clear">
-                    <Trash2 className="w-4 h-4 text-red-400 text-zinc-400" />
+                    <Trash2 className="w-4 h-4 text-red-400 text-muted-foreground" />
                   </Button>
                 </div>
               </CardHeader>
@@ -180,12 +180,12 @@ export default function DashboardPage() {
                   <motion.p 
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
-                    className="text-lg leading-relaxed text-zinc-100"
+                    className="text-lg leading-relaxed text-foreground"
                   >
                     {transcription}
                   </motion.p>
                 ) : (
-                  <div className="h-full flex items-center justify-center text-zinc-600 italic">
+                  <div className="h-full flex items-center justify-center text-muted-foreground italic">
                     {isProcessing ? "Whisper AI is working..." : "Transcription will appear here..."}
                   </div>
                 )}
