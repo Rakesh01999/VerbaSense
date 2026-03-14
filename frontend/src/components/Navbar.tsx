@@ -90,9 +90,9 @@ export default function Navbar() {
                 onClick={() => setUserMenuOpen(!userMenuOpen)}
                 className="flex items-center gap-2 p-1 pl-3 rounded-full bg-secondary border border-border hover:bg-muted transition-colors"
               >
-                <span className="text-sm font-medium text-foreground">{user?.email?.split('@')[0]}</span>
+                <span className="text-sm font-medium text-foreground">{user?.name || user?.email?.split('@')[0]}</span>
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-xs font-bold">
-                  {user?.email?.[0].toUpperCase()}
+                  {(user?.name?.[0] || user?.email?.[0] || "U").toUpperCase()}
                 </div>
                 <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
               </button>
@@ -110,6 +110,12 @@ export default function Navbar() {
                       className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
                     >
                       <LayoutDashboard className="w-4 h-4" /> Dashboard
+                    </Link>
+                    <Link
+                      href="/profile"
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-foreground hover:bg-accent hover:text-accent-foreground transition-colors"
+                    >
+                      <User className="w-4 h-4" /> Profile
                     </Link>
                     <button
                       onClick={handleLogout}

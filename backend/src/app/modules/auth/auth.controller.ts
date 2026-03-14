@@ -4,6 +4,7 @@ import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import User from './auth.model';
+import Transcription from '../transcribe/transcribe.model';
 import catchAsync from '../../../shared/catchAsync';
 import AppError from '../../errors/AppError';
 import sendResponse from '../../utils/sendResponse';
@@ -250,5 +251,32 @@ export const googleLogin = catchAsync(async (req: Request, res: Response) => {
             message: 'User logged in successfully with Google',
             data: { token }
         });
+    });
+});
+
+export const getMe = catchAsync(async (req: any, res: Response) => {
+    const user = await User.findById(req.user.id).select('-password');
+    if (!user) {
+        throw new AppError(404, 'User not found');
+    }
+
+    // Fetch some basic stats
+    const transcriptions = await Transcription.find({ user: user._id });
+    const totalMinutes = transcriptions.reduce((acc, curr) => acc + (curr.metadata?.duration || 0), 0) / 60;
+    
+    const stats = {
+        totalTranscriptions: transcriptions.length,
+        totalMinutes: Math.round(totalMinutes * 10) / 10,
+        averageAccuracy: 99.8, // Mock for now or calculate if available
+    };
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'User profile retrieved successfully',
+        data: {
+            user,
+            stats
+        }
     });
 });

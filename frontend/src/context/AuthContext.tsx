@@ -8,6 +8,13 @@ interface User {
   id: string
   email: string
   name?: string
+  date?: string
+}
+
+interface UserStats {
+  totalTranscriptions: number
+  totalMinutes: number
+  averageAccuracy: number
 }
 
 interface JwtPayload {
@@ -20,10 +27,12 @@ interface JwtPayload {
 
 interface AuthContextType {
   user: User | null
+  stats: UserStats | null
   token: string | null
   isLoading: boolean
   login: (token: string, profile?: Partial<User>) => void
   logout: () => void
+  refreshUser: () => Promise<void>
   isAuthenticated: boolean
 }
 
@@ -47,9 +56,31 @@ function decodeUser(token: string): User | null {
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
+  const [stats, setStats] = useState<UserStats | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
+
+  const refreshUser = async () => {
+    const currentToken = localStorage.getItem('token') || token
+    if (!currentToken) return
+
+    try {
+      const response = await fetch('http://localhost:5000/api/auth/me', {
+        headers: {
+          'Authorization': `Bearer ${currentToken}`
+        }
+      })
+      const result = await response.json()
+      if (result.success) {
+        setUser(result.data.user)
+        setStats(result.data.stats)
+        localStorage.setItem('user', JSON.stringify(result.data.user))
+      }
+    } catch (error) {
+      console.error('Error refreshing user:', error)
+    }
+  }
 
   useEffect(() => {
     const storedToken = localStorage.getItem('token')
@@ -58,12 +89,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (storedToken) {
       const decoded = decodeUser(storedToken)
       if (decoded) {
-        // Merge decoded token info with stored user profile
-        const storedUserObj = storedUser ? JSON.parse(storedUser) : {}
         setToken(storedToken)
-        setUser({ ...decoded, ...storedUserObj })
+        // Try to fetch newest data from backend
+        refreshUser()
       } else {
-        // Token expired — clear it
         localStorage.removeItem('token')
         localStorage.removeItem('user')
       }
@@ -101,7 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, token, isLoading, login, logout, isAuthenticated: !!token }}>
+    <AuthContext.Provider value={{ user, stats, token, isLoading, login, logout, refreshUser, isAuthenticated: !!token }}>
       {children}
     </AuthContext.Provider>
   )

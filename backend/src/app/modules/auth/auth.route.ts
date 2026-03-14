@@ -1,5 +1,6 @@
 import express from 'express';
 import * as authController from './auth.controller';
+import auth from '../../middlewares/auth';
 
 const router = express.Router();
 
@@ -11,6 +12,9 @@ router.post('/login', authController.login);
 
 // @route   POST api/auth/users
 router.get('/users', authController.getAllUsers);
+
+// @route   GET api/auth/me
+router.get('/me', auth, authController.getMe);
 
 // @route   POST api/auth/google-login
 router.post('/google-login', authController.googleLogin);
