@@ -45,11 +45,8 @@ export default function Navbar() {
     { name: "Contact", href: "/#contact" },
   ]
 
-  // Hide navbar on auth pages if needed, or keep it. Usually landing navbar is different from dashboard.
   // For now, let's keep it global but style it.
   const isDashboard = pathname.startsWith("/dashboard")
-
-  if (isDashboard) return null // Dashboard usually has its own sidebar/header
 
   return (
     <nav

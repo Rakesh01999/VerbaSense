@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext"
 import { useToast } from "@/context/ToastContext"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mic, Square, Loader2, LogOut, History, Settings, User, Copy, Trash2 } from "lucide-react"
+import { Mic, Square, Loader2, LogOut, History, Settings, User, Copy, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 export default function DashboardPage() {
@@ -14,6 +14,7 @@ export default function DashboardPage() {
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [transcription, setTranscription] = useState("")
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
 
   const toggleRecording = () => {
     if (isRecording) {
@@ -48,50 +49,121 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex">
+    <div className="min-h-screen bg-background text-foreground flex pt-20 overflow-x-hidden">
       {/* Sidebar */}
-      <aside className="w-64 border-r border-border flex flex-col p-4 bg-muted/20 backdrop-blur-md hidden md:flex">
-        <div className="flex items-center gap-2 mb-8 px-2">
-          <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-            <Mic className="w-4 h-4 text-white" />
+      <aside 
+        className={`fixed left-0 top-20 bottom-0 z-40 border-r border-border flex flex-col p-4 bg-muted/30 backdrop-blur-xl hidden md:flex transition-all duration-300 shadow-[20px_0_50px_rgba(0,0,0,0.1)] ${
+          isSidebarCollapsed ? "w-20" : "w-64"
+        }`}
+      >
+        {/* Floating Toggle Button */}
+        <button
+          onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+          className="absolute -right-3 top-1/2 -translate-y-1/2 w-6 h-6 bg-primary text-primary-foreground rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform z-50 focus:outline-none"
+          title={isSidebarCollapsed ? "Expand Sidebar" : "Collapse Sidebar"}
+        >
+          {isSidebarCollapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
+        </button>
+
+        <div className={`flex items-center gap-3 mb-8 px-2 ${isSidebarCollapsed ? "justify-center" : ""}`}>
+          <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/20">
+            <Mic className="w-5 h-5 text-white" />
           </div>
-          <span className="font-bold text-xl">VerbaSense</span>
+          {!isSidebarCollapsed && (
+            <motion.div
+              initial={{ opacity: 0, x: -10 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="flex flex-col"
+            >
+              {/* <span className="font-bold text-lg tracking-tight leading-none">VerbaSense</span> */}
+              <span className="font-bold text-lg tracking-tight leading-none">Dashboard</span>
+              {/* <span className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">Transcription</span> */}
+            </motion.div>
+          )}
         </div>
 
-        <nav className="flex-1 space-y-1">
-          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-accent/50">
-            <Mic className="mr-2 w-4 h-4" /> Recorder
-          </Button>
-          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-accent/50">
-            <History className="mr-2 w-4 h-4" /> History
-          </Button>
-          <Button variant="ghost" className="w-full justify-start text-muted-foreground hover:text-foreground hover:bg-accent/50">
-            <Settings className="mr-2 w-4 h-4" /> Settings
-          </Button>
+        <nav className="flex-1 space-y-2">
+          {[
+            { icon: Mic, label: "Recorder", active: true },
+            { icon: History, label: "History" },
+            { icon: Settings, label: "Settings" }
+          ].map((item) => (
+            <Button 
+              key={item.label}
+              variant="ghost" 
+              className={`w-full group relative transition-all duration-200 ${
+                isSidebarCollapsed ? "justify-center px-0" : "justify-start px-3"
+              } ${item.active ? "bg-primary/10 text-primary hover:bg-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}
+              title={isSidebarCollapsed ? item.label : ""}
+            >
+              {item.active && !isSidebarCollapsed && (
+                <motion.div 
+                  layoutId="active-pill"
+                  className="absolute left-0 w-1 h-6 bg-primary rounded-r-full" 
+                />
+              )}
+              <item.icon className={`${isSidebarCollapsed ? "" : "mr-3"} w-5 h-5 shrink-0 transition-transform group-hover:scale-110`} />
+              {!isSidebarCollapsed && (
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="font-medium"
+                >
+                  {item.label}
+                </motion.span>
+              )}
+            </Button>
+          ))}
         </nav>
 
-        <div className="mt-auto pt-4 border-t border-border space-y-2">
-          <div className="flex items-center gap-3 px-2 mb-4">
-            <div className="w-8 h-8 rounded-full bg-accent flex items-center justify-center">
-              <User className="w-4 h-4 text-muted-foreground" />
+        <div className="mt-auto pt-4 border-t border-border/50 space-y-4">
+          <div className={`flex items-center gap-3 px-2 py-2 rounded-xl transition-colors ${isSidebarCollapsed ? "justify-center" : "bg-accent/30"}`}>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-accent to-muted flex items-center justify-center shrink-0 border border-border">
+              <User className="w-5 h-5 text-muted-foreground" />
             </div>
-            <div className="flex flex-col">
-              <span className="text-sm font-medium truncate w-32">{user?.email?.split('@')[0]}</span>
-              <span className="text-xs text-muted-foreground">Free Plan</span>
-            </div>
+            {!isSidebarCollapsed && (
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="flex flex-col min-w-0"
+              >
+                <span className="text-sm font-bold truncate text-foreground">{user?.email?.split('@')[0]}</span>
+                <div className="flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
+                  <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">Free Plan</span>
+                </div>
+              </motion.div>
+            )}
           </div>
+          
           <Button 
             variant="ghost" 
-            className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
+            className={`w-full hover:text-red-300 hover:bg-red-500/10 text-red-400/80 transition-all ${
+              isSidebarCollapsed ? "justify-center px-0" : "justify-start px-3"
+            }`}
             onClick={handleLogout}
+            title={isSidebarCollapsed ? "Logout" : ""}
           >
-            <LogOut className="mr-2 w-4 h-4" /> Logout
+            <LogOut className={`${isSidebarCollapsed ? "" : "mr-3"} w-5 h-5 shrink-0 transition-transform group-hover:-translate-x-1`} />
+            {!isSidebarCollapsed && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                className="font-medium"
+              >
+                Logout
+              </motion.span>
+            )}
           </Button>
         </div>
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col p-6 overflow-y-auto">
+      <main 
+        className={`flex-1 flex flex-col p-6 overflow-y-auto transition-all duration-300 ${
+          isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
+        }`}
+      >
         <header className="flex justify-between items-center mb-8 md:hidden">
           <div className="flex items-center gap-2">
             <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
