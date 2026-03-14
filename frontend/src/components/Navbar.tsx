@@ -39,10 +39,10 @@ export default function Navbar() {
   }
 
   const navLinks = [
-    { name: "Home", href: "/" },
-    { name: "Features", href: "/#features" },
-    { name: "Pricing", href: "/#pricing" },
-    { name: "Contact", href: "/#contact" },
+    { name: "Product", href: "/product" },
+    { name: "Features", href: "/features" },
+    { name: "Pricing", href: "/pricing" },
+    { name: "Contact", href: "/contact" },
   ]
 
   // For now, let's keep it global but style it.

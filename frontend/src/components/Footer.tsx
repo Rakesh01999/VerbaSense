@@ -8,10 +8,10 @@ export default function Footer() {
     {
       title: "Product",
       links: [
-        { name: "Features", href: "/#features" },
-        { name: "API Reference", href: "/docs/api" },
+        { name: "Features", href: "/features" },
+        { name: "API Reference", href: "/api-reference" },
         { name: "Integrations", href: "/integrations" },
-        { name: "Pricing", href: "/#pricing" },
+        { name: "Pricing", href: "/pricing" },
       ],
     },
     {
@@ -20,7 +20,7 @@ export default function Footer() {
         { name: "About Us", href: "/about" },
         { name: "Blog", href: "/blog" },
         { name: "Careers", href: "/careers" },
-        { name: "Contact", href: "/#contact" },
+        { name: "Contact", href: "/contact" },
       ],
     },
     {
@@ -43,7 +43,7 @@ export default function Footer() {
               <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
                 <Mic className="text-white w-5 h-5" />
               </div>
-              <span className="text-xl font-bold tracking-tight text-white">
+              <span className="text-xl font-bold tracking-tight text-foreground">
                 Verba<span className="text-purple-500">Sense</span>
               </span>
             </Link>

@@ -88,6 +88,8 @@ export default function LoginPage() {
                 </div>
                 <PasswordInput 
                   id="password" 
+                  type="password" 
+                  placeholder="********" 
                   className="bg-secondary/50 border-border text-foreground focus-visible:ring-purple-500"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
