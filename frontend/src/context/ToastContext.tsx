@@ -32,11 +32,11 @@ const ICONS: Record<ToastType, React.ReactNode> = {
 
 const STYLES: Record<ToastType, string> = {
   success:
-    "border-green-500/30 bg-green-500/10 text-green-100",
+    "border-green-500/50 bg-green-950/90 text-green-50 shadow-green-500/10",
   error:
-    "border-red-500/30 bg-red-500/10 text-red-100",
+    "border-red-500/50 bg-red-950/90 text-red-50 shadow-red-500/10",
   info:
-    "border-blue-500/30 bg-blue-500/10 text-blue-100",
+    "border-blue-500/50 bg-blue-950/90 text-blue-50 shadow-blue-500/10",
 }
 
 const AUTO_DISMISS_MS = 5000
@@ -72,7 +72,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: 12, scale: 0.95 }}
               transition={{ type: "spring", stiffness: 400, damping: 28 }}
-              className={`pointer-events-auto flex items-start gap-3 w-full max-w-sm px-4 py-3 rounded-xl border backdrop-blur-xl shadow-2xl ${STYLES[toast.type]}`}
+              className={`pointer-events-auto flex items-start gap-3 w-full max-w-sm px-4 py-4 rounded-xl border-2 backdrop-blur-2xl shadow-2xl ${STYLES[toast.type]}`}
             >
               {/* Icon */}
               <span className="mt-0.5">{ICONS[toast.type]}</span>

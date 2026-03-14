@@ -42,6 +42,11 @@ export default function DashboardPage() {
     showToast("Transcription cleared.", "info")
   }
 
+  const handleLogout = () => {
+    logout()
+    showToast("Signed out successfully. See you soon!", "info")
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground flex">
       {/* Sidebar */}
@@ -78,7 +83,7 @@ export default function DashboardPage() {
           <Button 
             variant="ghost" 
             className="w-full justify-start text-red-400 hover:text-red-300 hover:bg-red-500/10"
-            onClick={logout}
+            onClick={handleLogout}
           >
             <LogOut className="mr-2 w-4 h-4" /> Logout
           </Button>
@@ -94,7 +99,7 @@ export default function DashboardPage() {
             </div>
             <span className="font-bold text-xl">VerbaSense</span>
           </div>
-          <Button variant="ghost" size="icon" onClick={logout}>
+          <Button variant="ghost" size="icon" onClick={handleLogout}>
             <LogOut className="w-5 h-5 text-muted-foreground" />
           </Button>
         </header>

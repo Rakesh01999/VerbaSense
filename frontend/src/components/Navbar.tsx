@@ -6,11 +6,13 @@ import { usePathname } from "next/navigation"
 import { Mic, Menu, X, User, LogOut, LayoutDashboard, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { useAuth } from "@/context/AuthContext"
+import { useToast } from "@/context/ToastContext"
 import { motion, AnimatePresence } from "framer-motion"
 import { ThemeToggle } from "@/components/ThemeToggle"
 
 export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth()
+  const { showToast } = useToast()
   const pathname = usePathname()
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -30,6 +32,11 @@ export default function Navbar() {
     setMobileMenuOpen(false)
     setUserMenuOpen(false)
   }, [pathname])
+
+  const handleLogout = () => {
+    logout()
+    showToast("Signed out successfully. See you soon!", "info")
+  }
 
   const navLinks = [
     { name: "Home", href: "/" },
@@ -108,7 +115,7 @@ export default function Navbar() {
                       <LayoutDashboard className="w-4 h-4" /> Dashboard
                     </Link>
                     <button
-                      onClick={logout}
+                      onClick={handleLogout}
                       className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-400 hover:bg-red-500/10 transition-colors text-left"
                     >
                       <LogOut className="w-4 h-4" /> Logout
@@ -165,7 +172,7 @@ export default function Navbar() {
               {isAuthenticated ? (
                 <>
                   <Link href="/dashboard" className="text-lg font-medium text-muted-foreground">Dashboard</Link>
-                  <button onClick={logout} className="text-lg font-medium text-destructive text-left">Logout</button>
+                   <button onClick={handleLogout} className="text-lg font-medium text-destructive text-left">Logout</button>
                 </>
               ) : (
                 <>

@@ -2,32 +2,33 @@
 
 import React, { useState } from "react"
 import Link from "next/link"
+import { useToast } from "@/context/ToastContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mic, AlertCircle, Loader2, CheckCircle2, ArrowLeft } from "lucide-react"
+import { Mic, Loader2, CheckCircle2, ArrowLeft } from "lucide-react"
 import { apiForgotPassword } from "@/lib/api"
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("")
-  const [error, setError] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const { showToast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setError("")
     setIsLoading(true)
 
     try {
       await apiForgotPassword(email)
       setIsSuccess(true)
+      showToast("Reset link sent! Please check your inbox.", "success")
     } catch (err: unknown) {
       if (err instanceof Error) {
-        setError(err.message)
+        showToast(err.message, "error")
       } else {
-        setError("An unexpected error occurred. Please try again.")
+        showToast("An unexpected error occurred. Please try again.", "error")
       }
     } finally {
       setIsLoading(false)
@@ -78,12 +79,6 @@ export default function ForgotPasswordPage() {
               </CardHeader>
               <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4">
-                  {error && (
-                    <div className="flex items-center gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/30 text-destructive text-sm">
-                      <AlertCircle className="w-4 h-4 shrink-0" />
-                      <span>{error}</span>
-                    </div>
-                  )}
                   <div className="space-y-2">
                     <Label htmlFor="email" className="text-foreground/80">Email Address</Label>
                     <Input
