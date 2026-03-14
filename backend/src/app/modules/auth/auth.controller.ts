@@ -145,8 +145,9 @@ export const forgotPassword = catchAsync(async (req: Request, res: Response) => 
 
     await user.save();
 
-    // Send email with the raw token in the link
-    const resetLink = `${req.protocol}://${req.get('host')}/api/auth/reset-password/${rawToken}`;
+    // Send email with the raw token in the link — frontend handles the reset form
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:3000';
+    const resetLink = `${frontendUrl}/reset-password?token=${rawToken}`;
     await sendPasswordResetEmail(user.email, resetLink);
 
     sendResponse(res, {

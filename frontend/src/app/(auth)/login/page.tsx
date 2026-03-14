@@ -3,22 +3,38 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import { useAuth } from "@/context/AuthContext"
+import { useToast } from "@/context/ToastContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mic } from "lucide-react"
+import { Mic, Loader2 } from "lucide-react"
+import { apiLogin } from "@/lib/api"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const { login } = useAuth()
+  const { showToast } = useToast()
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    // TODO: Connect to actual backend API
-    // Mock login for now
-    login("mock-jwt-token", { id: "1", email })
+    setIsLoading(true)
+
+    try {
+      const res = await apiLogin(email, password)
+      login(res.data.token, { email })
+      showToast("Welcome back! Signed in successfully.", "success")
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        showToast(err.message, "error")
+      } else {
+        showToast("An unexpected error occurred. Please try again.", "error")
+      }
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   return (
@@ -38,13 +54,14 @@ export default function LoginPage() {
 
         <Card className="border-border bg-card/50 backdrop-blur-xl shadow-2xl">
           <CardHeader>
-            <CardTitle className="text-2xl text-foreground">Login</CardTitle>
+            <CardTitle className="text-2xl text-foreground">Sign In</CardTitle>
             <CardDescription className="text-muted-foreground">
               Enter your credentials to access your transcriptions.
             </CardDescription>
           </CardHeader>
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
+
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-foreground/80">Email</Label>
                 <Input 
@@ -55,6 +72,7 @@ export default function LoginPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
               <div className="space-y-2">
@@ -74,18 +92,24 @@ export default function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
+                  disabled={isLoading}
                 />
               </div>
             </CardContent>
             <CardFooter className="flex flex-col space-y-4">
               <Button 
                 type="submit" 
+                disabled={isLoading}
                 className="w-full bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 text-white font-medium py-6 rounded-xl transition-all shadow-lg shadow-purple-500/20"
               >
-                Sign In
+                {isLoading ? (
+                  <><Loader2 className="mr-2 w-4 h-4 animate-spin" /> Signing In...</>
+                ) : (
+                  "Sign In"
+                )}
               </Button>
               <div className="text-center text-sm text-muted-foreground">
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
                 <Link href="/register" className="text-purple-600 dark:text-purple-400 hover:text-purple-500 font-medium transition-colors">
                   Create Account
                 </Link>

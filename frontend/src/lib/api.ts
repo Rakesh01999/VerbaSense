@@ -1,0 +1,76 @@
+// Centralized API service for VerbaSense backend
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+
+interface ApiResponse<T = null> {
+  success: boolean
+  message: string
+  data: T
+}
+
+async function request<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<ApiResponse<T>> {
+  const res = await fetch(`${API_BASE}${endpoint}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.headers || {}),
+    },
+    ...options,
+  })
+
+  const json = await res.json()
+
+  if (!res.ok) {
+    // Backend sends { message: "..." } on errors
+    throw new Error(json.message || "Something went wrong")
+  }
+
+  return json as ApiResponse<T>
+}
+
+// ─── Auth Endpoints ──────────────────────────────────────────────────
+
+export async function apiRegister(name: string, email: string, password: string) {
+  return request<null>("/auth/register", {
+    method: "POST",
+    body: JSON.stringify({ name, email, password }),
+  })
+}
+
+export async function apiLogin(email: string, password: string) {
+  return request<{ token: string }>("/auth/login", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  })
+}
+
+export async function apiForgotPassword(email: string) {
+  return request<null>("/auth/forgot-password", {
+    method: "POST",
+    body: JSON.stringify({ email }),
+  })
+}
+
+export async function apiResetPassword(token: string, password: string) {
+  return request<null>(`/auth/reset-password/${token}`, {
+    method: "POST",
+    body: JSON.stringify({ password }),
+  })
+}
+
+// ─── Authenticated Requests ──────────────────────────────────────────
+
+export async function apiRequest<T>(
+  endpoint: string,
+  token: string,
+  options: RequestInit = {}
+) {
+  return request<T>(endpoint, {
+    ...options,
+    headers: {
+      Authorization: `Bearer ${token}`,
+      ...(options.headers || {}),
+    },
+  })
+}

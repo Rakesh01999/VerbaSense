@@ -1,14 +1,16 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import { useAuth } from "@/context/AuthContext"
+import { useToast } from "@/context/ToastContext"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mic, Square, Loader2, LogOut, History, Settings, User, Copy, Trash2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
 export default function DashboardPage() {
   const { user, logout } = useAuth()
+  const { showToast } = useToast()
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [transcription, setTranscription] = useState("")
@@ -21,6 +23,7 @@ export default function DashboardPage() {
       setTimeout(() => {
         setIsProcessing(false)
         setTranscription("This is a simulated transcription from VerbaSense using OpenAI's Whisper model. Our system accurately captures your voice and converts it to text in seconds.")
+        showToast("Transcription complete!", "success")
       }, 2000)
     } else {
       setIsRecording(true)
@@ -29,11 +32,14 @@ export default function DashboardPage() {
   }
 
   const copyToClipboard = () => {
+    if (!transcription) return
     navigator.clipboard.writeText(transcription)
+    showToast("Transcription copied to clipboard.", "success")
   }
 
   const clearTranscription = () => {
     setTranscription("")
+    showToast("Transcription cleared.", "info")
   }
 
   return (
