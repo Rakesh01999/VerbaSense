@@ -5,6 +5,7 @@ import Link from "next/link"
 import { useToast } from "@/context/ToastContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mic, UserPlus, Loader2, CheckCircle2 } from "lucide-react"
@@ -95,7 +96,7 @@ export default function RegisterPage() {
                     <Label htmlFor="name" className="text-foreground/80">Full Name</Label>
                     <Input 
                       id="name" 
-                      placeholder="John Doe" 
+                      placeholder="Enter your full name here" 
                       className="bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-purple-500"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
@@ -117,10 +118,9 @@ export default function RegisterPage() {
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="password" className="text-foreground/80">Password</Label>
-                    <Input 
+                    <Label htmlFor="password" title="Password must be at least 6 characters long" className="text-foreground/80">Password</Label>
+                    <PasswordInput 
                       id="password" 
-                      type="password" 
                       placeholder="Min. 6 characters"
                       className="bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-purple-500"
                       value={password}

@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation"
 import { useToast } from "@/context/ToastContext"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mic, Loader2, CheckCircle2 } from "lucide-react"
@@ -86,10 +87,9 @@ function ResetPasswordForm() {
           <form onSubmit={handleSubmit}>
             <CardContent className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-foreground/80">New Password</Label>
-                <Input
+                <Label htmlFor="password" title="Password must be at least 6 characters long" className="text-foreground/80">New Password</Label>
+                <PasswordInput
                   id="password"
-                  type="password"
                   placeholder="Min. 6 characters"
                   className="bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-purple-500"
                   value={password}
@@ -99,10 +99,9 @@ function ResetPasswordForm() {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword" className="text-foreground/80">Confirm Password</Label>
-                <Input
+                <Label htmlFor="confirmPassword" title="Repeat your new password" className="text-foreground/80">Confirm Password</Label>
+                <PasswordInput
                   id="confirmPassword"
-                  type="password"
                   placeholder="Repeat your new password"
                   className="bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground focus-visible:ring-purple-500"
                   value={confirmPassword}
