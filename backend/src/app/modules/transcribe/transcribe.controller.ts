@@ -11,13 +11,14 @@ export const uploadAndTranscribe = catchAsync(async (req: AuthRequest, res: Resp
     }
 
     const audioPath = req.file.path;
+    const language = req.body.language || 'en';
     const transcribedText = await transcribeAudio(audioPath);
 
     const newTranscription = new Transcription({
         user: (req.user as any)?.id || req.user,
         audioUrl: audioPath,
         transcribedText,
-        language: 'en',
+        language,
         metadata: {
             size: req.file.size,
             format: req.file.mimetype
@@ -67,5 +68,18 @@ export const deleteTranscription = catchAsync(async (req: AuthRequest, res: Resp
         success: true,
         message: 'Transcription deleted successfully',
         data: transcription
+    });
+});
+
+export const clearAllHistory = catchAsync(async (req: AuthRequest, res: Response) => {
+    const result = await Transcription.deleteMany({
+        user: (req.user as any)?.id || req.user
+    });
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: `Deleted ${result.deletedCount} transcriptions`,
+        data: result
     });
 });

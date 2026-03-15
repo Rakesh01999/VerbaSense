@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mic, Square, Loader2, LogOut, History, Settings, User, Copy, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
+import { ConfirmationModal } from "@/components/ui/confirmation-modal"
 
 interface TranscriptionItem {
   _id: string;
@@ -30,8 +31,23 @@ export default function DashboardPage() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   
+  const [modalConfig, setModalConfig] = useState<{
+    isOpen: boolean;
+    title: string;
+    description: string;
+    onConfirm: () => void;
+    confirmText?: string;
+    variant?: "danger" | "warning" | "info";
+  }>({
+    isOpen: false,
+    title: "",
+    description: "",
+    onConfirm: () => {},
+  })
+  
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
   const [audioChunks, setAudioChunks] = useState<Blob[]>([])
+  const [transcriptionLanguage, setTranscriptionLanguage] = useState("en")
 
   // Fetch history on mount or tab change
   React.useEffect(() => {
@@ -59,22 +75,58 @@ export default function DashboardPage() {
     }
   }
 
-  const deleteHistoryItem = async (id: string) => {
-    try {
-      const token = localStorage.getItem('token')
-      const response = await fetch(`http://localhost:5000/api/transcribe/${id}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
-      })
-      const result = await response.json()
-      if (result.success) {
-        setHistory(prev => prev.filter(item => item._id !== id))
-        showToast("Transcription deleted.", "success")
+  const deleteHistoryItem = (id: string) => {
+    setModalConfig({
+      isOpen: true,
+      title: "Delete Transcription",
+      description: "Are you sure you want to delete this transcription? This action cannot be undone.",
+      confirmText: "Delete",
+      variant: "danger",
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('token')
+          const response = await fetch(`http://localhost:5000/api/transcribe/${id}`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+          const result = await response.json()
+          if (result.success) {
+            setHistory(prev => prev.filter(item => item._id !== id))
+            showToast("Transcription deleted.", "success")
+          }
+        } catch (err) {
+          console.error("Error deleting item:", err)
+          showToast("Failed to delete transcription.", "error")
+        }
       }
-    } catch (err) {
-      console.error("Error deleting item:", err)
-      showToast("Failed to delete transcription.", "error")
-    }
+    })
+  }
+
+  const clearAllHistory = () => {
+    setModalConfig({
+      isOpen: true,
+      title: "Clear All History",
+      description: "Wait! This will permanently delete your entire transcription history. Are you sure you want to proceed?",
+      confirmText: "Clear All",
+      variant: "danger",
+      onConfirm: async () => {
+        try {
+          const token = localStorage.getItem('token')
+          const response = await fetch(`http://localhost:5000/api/transcribe`, {
+            method: 'DELETE',
+            headers: { 'Authorization': `Bearer ${token}` }
+          })
+          const result = await response.json()
+          if (result.success) {
+            setHistory([])
+            showToast("All history cleared.", "success")
+          }
+        } catch (err) {
+          console.error("Error clearing history:", err)
+          showToast("Failed to clear history.", "error")
+        }
+      }
+    })
   }
 
   const startRecording = async () => {
@@ -116,10 +168,11 @@ export default function DashboardPage() {
 
   const sendAudioToBackend = async (audioBlob: Blob) => {
     try {
+      const token = localStorage.getItem('token')
       const formData = new FormData()
       formData.append('audio', audioBlob, 'recording.wav')
+      formData.append('language', transcriptionLanguage)
 
-      const token = localStorage.getItem('token')
       const response = await fetch('http://localhost:5000/api/transcribe', {
         method: 'POST',
         headers: {
@@ -206,19 +259,20 @@ export default function DashboardPage() {
 
         <nav className="flex-1 space-y-2">
           {[
-            { icon: Mic, label: "Recorder", active: true },
-            { icon: History, label: "History" },
-            { icon: Settings, label: "Settings" }
+            { icon: Mic, label: "Recorder", id: "recorder" },
+            { icon: History, label: "History", id: "history" },
+            { icon: Settings, label: "Settings", id: "settings" }
           ].map((item) => (
             <Button 
-              key={item.label}
+              key={item.id}
               variant="ghost" 
               className={`w-full group relative transition-all duration-200 ${
                 isSidebarCollapsed ? "justify-center px-0" : "justify-start px-3"
-              } ${item.active ? "bg-primary/10 text-primary hover:bg-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}
+              } ${activeTab === item.id ? "bg-primary/10 text-primary hover:bg-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}
               title={isSidebarCollapsed ? item.label : ""}
+              onClick={() => setActiveTab(item.id)}
             >
-              {item.active && !isSidebarCollapsed && (
+              {activeTab === item.id && !isSidebarCollapsed && (
                 <motion.div 
                   layoutId="active-pill"
                   className="absolute left-0 w-1 h-6 bg-primary rounded-r-full" 
@@ -473,14 +527,92 @@ export default function DashboardPage() {
               </div>
             </>
           ) : (
-            <div className="p-20 text-center">
-              <Settings className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
-              <h2 className="text-2xl font-bold mb-2">Settings</h2>
-              <p className="text-muted-foreground">Settings are coming soon in a future update.</p>
+            <div className="space-y-8 pb-10">
+              <div className="mb-8 text-center md:text-left">
+                <h2 className="text-3xl font-bold mb-2">Settings</h2>
+                <p className="text-muted-foreground">Manage your account and transcription preferences.</p>
+              </div>
+
+              {/* Profile Section */}
+              <Card className="border-border bg-card/40 backdrop-blur-sm p-6">
+                <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
+                  <User className="w-5 h-5 text-primary" /> Profile Information
+                </h3>
+                <div className="space-y-4">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted/20 rounded-xl border border-white/5">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Email Address</p>
+                      <p className="font-medium">{user?.email}</p>
+                    </div>
+                    <span className="mt-2 sm:mt-0 text-xs font-medium text-green-500 bg-green-500/10 px-3 py-1 rounded-full w-fit"> Verified</span>
+                  </div>
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 bg-muted/20 rounded-xl border border-white/5">
+                    <div>
+                      <p className="text-sm text-muted-foreground mb-1">Account Status</p>
+                      <p className="font-medium">Free Tier</p>
+                    </div>
+                    <Button variant="outline" size="sm" className="mt-2 sm:mt-0 border-primary/20 hover:bg-primary/10">Upgrade Plan</Button>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Preferences Section */}
+              <Card className="border-border bg-card/40 backdrop-blur-sm p-6">
+                <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-primary" /> Transcription Preferences
+                </h3>
+                <div className="space-y-6">
+                  <div className="flex flex-col gap-2">
+                    <label className="text-sm text-muted-foreground">Default Language</label>
+                    <select 
+                      value={transcriptionLanguage}
+                      onChange={(e) => setTranscriptionLanguage(e.target.value)}
+                      className="bg-muted/30 border border-white/10 rounded-lg p-2 focus:ring-2 focus:ring-primary/50 outline-none"
+                    >
+                      <option value="en">English (US/UK)</option>
+                      <option value="es">Spanish</option>
+                      <option value="fr">French</option>
+                      <option value="de">German</option>
+                      <option value="auto">Auto-detect</option>
+                    </select>
+                    <p className="text-[10px] text-muted-foreground italic">Note: Whisper engine currently optimized for English.</p>
+                  </div>
+                </div>
+              </Card>
+
+              {/* Danger Zone */}
+              <Card className="border-red-500/20 bg-red-500/5 backdrop-blur-sm p-6">
+                <h3 className="text-lg font-semibold mb-6 text-red-400 flex items-center gap-2">
+                  <Trash2 className="w-5 h-5" /> Danger Zone
+                </h3>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <p className="font-medium text-red-200">Clear Transcription History</p>
+                    <p className="text-xs text-red-400/60 max-w-sm">This will permanently delete all your previous recordings and transcriptions. This action cannot be reversed.</p>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20"
+                    onClick={clearAllHistory}
+                  >
+                    Delete Everything
+                  </Button>
+                </div>
+              </Card>
             </div>
           )}
         </section>
       </main>
+
+      <ConfirmationModal
+        isOpen={modalConfig.isOpen}
+        onClose={() => setModalConfig(prev => ({ ...prev, isOpen: false }))}
+        onConfirm={modalConfig.onConfirm}
+        title={modalConfig.title}
+        description={modalConfig.description}
+        confirmText={modalConfig.confirmText}
+        variant={modalConfig.variant}
+      />
     </div>
   )
 }
