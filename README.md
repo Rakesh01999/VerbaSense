@@ -5,7 +5,6 @@ VerbaSense is a premium, high-performance Speech-to-Text (STT) application that 
 ## 🚀 Key Features
 
 - **Real-time Transcription**: High-accuracy voice-to-text conversion using Whisper.
-- **Multi-language Support**: Optimized for English, Spanish, French, German, and automatic language detection.
 - **Interactive Dashboard**: Modern user interface with recording status visualizations and history management.
 - **Secure Processing**: JWT-based authentication ensures all data remains private.
 - **Data Safety**: Custom confirmation dialogs prevent accidental deletion of transcription history.
