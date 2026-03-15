@@ -8,33 +8,155 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mic, Square, Loader2, LogOut, History, Settings, User, Copy, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 
+interface TranscriptionItem {
+  _id: string;
+  transcribedText: string;
+  createdAt: string;
+  metadata?: {
+    size: number;
+    format: string;
+  };
+}
+
 export default function DashboardPage() {
   const { user, logout } = useAuth()
   const { showToast } = useToast()
+  
+  const [activeTab, setActiveTab] = useState("recorder")
   const [isRecording, setIsRecording] = useState(false)
   const [isProcessing, setIsProcessing] = useState(false)
   const [transcription, setTranscription] = useState("")
+  const [history, setHistory] = useState<TranscriptionItem[]>([])
+  const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  
+  const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
+  const [audioChunks, setAudioChunks] = useState<Blob[]>([])
 
-  const toggleRecording = () => {
-    if (isRecording) {
-      setIsRecording(false)
-      setIsProcessing(true)
-      // Simulate backend processing
-      setTimeout(() => {
-        setIsProcessing(false)
-        setTranscription("This is a simulated transcription from VerbaSense using OpenAI's Whisper model. Our system accurately captures your voice and converts it to text in seconds.")
-        showToast("Transcription complete!", "success")
-      }, 2000)
-    } else {
-      setIsRecording(true)
-      setTranscription("")
+  // Fetch history on mount or tab change
+  React.useEffect(() => {
+    if (activeTab === "history") {
+      fetchHistory()
+    }
+  }, [activeTab])
+
+  const fetchHistory = async () => {
+    setIsLoadingHistory(true)
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch('http://localhost:5000/api/transcribe/history', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      const result = await response.json()
+      if (result.success) {
+        setHistory(result.data)
+      }
+    } catch (err) {
+      console.error("Error fetching history:", err)
+      showToast("Failed to load history.", "error")
+    } finally {
+      setIsLoadingHistory(false)
     }
   }
 
-  const copyToClipboard = () => {
-    if (!transcription) return
-    navigator.clipboard.writeText(transcription)
+  const deleteHistoryItem = async (id: string) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`http://localhost:5000/api/transcribe/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      })
+      const result = await response.json()
+      if (result.success) {
+        setHistory(prev => prev.filter(item => item._id !== id))
+        showToast("Transcription deleted.", "success")
+      }
+    } catch (err) {
+      console.error("Error deleting item:", err)
+      showToast("Failed to delete transcription.", "error")
+    }
+  }
+
+  const startRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+      const recorder = new MediaRecorder(stream)
+      const chunks: Blob[] = []
+
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) {
+          chunks.push(e.data)
+        }
+      }
+
+      recorder.onstop = async () => {
+        const audioBlob = new Blob(chunks, { type: 'audio/wav' })
+        await sendAudioToBackend(audioBlob)
+        stream.getTracks().forEach(track => track.stop())
+      }
+
+      recorder.start()
+      setMediaRecorder(recorder)
+      setAudioChunks(chunks)
+      setIsRecording(true)
+      setTranscription("")
+    } catch (err) {
+      console.error("Error accessing microphone:", err)
+      showToast("Could not access microphone.", "error")
+    }
+  }
+
+  const stopRecording = () => {
+    if (mediaRecorder && isRecording) {
+      mediaRecorder.stop()
+      setIsRecording(false)
+      setIsProcessing(true)
+    }
+  }
+
+  const sendAudioToBackend = async (audioBlob: Blob) => {
+    try {
+      const formData = new FormData()
+      formData.append('audio', audioBlob, 'recording.wav')
+
+      const token = localStorage.getItem('token')
+      const response = await fetch('http://localhost:5000/api/transcribe', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        setTranscription(result.data.transcribedText)
+        showToast("Transcription complete!", "success")
+        // If history is open, refresh it
+        if (activeTab === "history") fetchHistory()
+      } else {
+        showToast(result.msg || "Transcription failed", "error")
+      }
+    } catch (err) {
+      console.error("Transcription error:", err)
+      showToast("Error connecting to server.", "error")
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const toggleRecording = () => {
+    if (isRecording) {
+      stopRecording()
+    } else {
+      startRecording()
+    }
+  }
+
+  const copyToClipboard = (text: string) => {
+    if (!text) return
+    navigator.clipboard.writeText(text)
     showToast("Transcription copied to clipboard.", "success")
   }
 
@@ -177,104 +299,186 @@ export default function DashboardPage() {
         </header>
 
         <section className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-2">Speech-to-Text</h2>
-            <p className="text-muted-foreground">Record your voice and let VerbaSense handle the rest.</p>
-          </div>
+          {activeTab === "recorder" ? (
+            <>
+              <div className="mb-8 text-center md:text-left">
+                <h2 className="text-3xl font-bold mb-2">Speech-to-Text</h2>
+                <p className="text-muted-foreground">Record your voice and let VerbaSense handle the rest.</p>
+              </div>
 
-          <div className="grid grid-cols-1 gap-6 flex-1">
-            {/* Recording Area */}
-            <Card className="border-border bg-card/50 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center relative overflow-hidden min-h-[400px]">
-              {/* Background gradient pulses when recording */}
-              <AnimatePresence>
-                {isRecording && (
-                  <motion.div 
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 0.3, scale: 1.5 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                    className="absolute inset-0 bg-purple-600/20 blur-[100px] rounded-full"
-                  />
-                )}
-              </AnimatePresence>
-
-              <div className="relative z-10 flex flex-col items-center">
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={toggleRecording}
-                  disabled={isProcessing}
-                  className={`w-32 h-32 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 ${
-                    isRecording 
-                    ? "bg-red-500 shadow-red-500/40" 
-                    : "bg-gradient-to-br from-purple-600 to-blue-600 shadow-purple-500/40 hover:shadow-purple-500/60"
-                  }`}
-                >
-                  {isRecording ? (
-                    <Square className="w-10 h-10 text-white fill-white" />
-                  ) : isProcessing ? (
-                    <Loader2 className="w-12 h-12 text-white animate-spin" />
-                  ) : (
-                    <Mic className="w-12 h-12 text-white" />
-                  )}
-                </motion.button>
-                
-                <div className="mt-8">
-                  <h3 className="text-xl font-semibold mb-1">
-                    {isRecording ? "Recording..." : isProcessing ? "Processing Audio..." : "Start Recording"}
-                  </h3>
-                  <p className="text-muted-foreground">
-                    {isRecording ? "Tap to finish transcription" : "Your voice patterns will be processed securely"}
-                  </p>
-                </div>
-
-                {isRecording && (
-                  <div className="mt-6 flex items-center gap-1">
-                    {[1, 2, 3, 4, 5].map((i) => (
-                      <motion.div
-                        key={i}
-                        animate={{ height: [8, 24, 8] }}
-                        transition={{ repeat: Infinity, duration: 0.8, delay: i * 0.1 }}
-                        className="w-1 bg-red-500 rounded-full"
+              <div className="grid grid-cols-1 gap-6 flex-1">
+                {/* Recording Area */}
+                <Card className="border-border bg-card/50 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center relative overflow-hidden min-h-[400px]">
+                  {/* Background gradient pulses when recording */}
+                  <AnimatePresence>
+                    {isRecording && (
+                      <motion.div 
+                        initial={{ opacity: 0, scale: 0.8 }}
+                        animate={{ opacity: 0.3, scale: 1.5 }}
+                        exit={{ opacity: 0, scale: 0.8 }}
+                        transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+                        className="absolute inset-0 bg-purple-600/20 blur-[100px] rounded-full"
                       />
-                    ))}
+                    )}
+                  </AnimatePresence>
+
+                  <div className="relative z-10 flex flex-col items-center">
+                    <motion.button
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      onClick={toggleRecording}
+                      disabled={isProcessing}
+                      className={`w-32 h-32 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 ${
+                        isRecording 
+                        ? "bg-red-500 shadow-red-500/40" 
+                        : "bg-gradient-to-br from-purple-600 to-blue-600 shadow-purple-500/40 hover:shadow-purple-500/60"
+                      }`}
+                    >
+                      {isRecording ? (
+                        <Square className="w-10 h-10 text-white fill-white" />
+                      ) : isProcessing ? (
+                        <Loader2 className="w-12 h-12 text-white animate-spin" />
+                      ) : (
+                        <Mic className="w-12 h-12 text-white" />
+                      )}
+                    </motion.button>
+                    
+                    <div className="mt-8">
+                      <h3 className="text-xl font-semibold mb-1">
+                        {isRecording ? "Recording..." : isProcessing ? "Processing Audio..." : "Start Recording"}
+                      </h3>
+                      <p className="text-muted-foreground">
+                        {isRecording ? "Tap to finish transcription" : "Your voice patterns will be processed securely"}
+                      </p>
+                    </div>
+
+                    {isRecording && (
+                      <div className="mt-6 flex items-center gap-1">
+                        {[1, 2, 3, 4, 5].map((i) => (
+                          <motion.div
+                            key={i}
+                            animate={{ height: [8, 24, 8] }}
+                            transition={{ repeat: Infinity, duration: 0.8, delay: i * 0.1 }}
+                            className="w-1 bg-red-500 rounded-full"
+                          />
+                        ))}
+                      </div>
+                    )}
                   </div>
+                </Card>
+
+                {/* Result Area */}
+                <Card className="border-border bg-card/50 backdrop-blur-xl flex flex-col">
+                  <CardHeader className="flex flex-row items-center justify-between border-b border-white/5">
+                    <div>
+                      <CardTitle className="text-sm uppercase tracking-wider text-muted-foreground font-bold">Transcription Result</CardTitle>
+                    </div>
+                    <div className="flex gap-2">
+                      <Button variant="ghost" size="icon" onClick={() => copyToClipboard(transcription)} title="Copy result">
+                        <Copy className="w-4 h-4 text-muted-foreground" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={clearTranscription} title="Clear">
+                        <Trash2 className="w-4 h-4 text-red-400 text-muted-foreground" />
+                      </Button>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-6 flex-1 min-h-[200px]">
+                    {transcription ? (
+                      <motion.p 
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-lg leading-relaxed text-foreground"
+                      >
+                        {transcription}
+                      </motion.p>
+                    ) : (
+                      <div className="h-full flex items-center justify-center text-muted-foreground italic">
+                        {isProcessing ? "Processing audio signal..." : "Transcription will appear here..."}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </>
+          ) : activeTab === "history" ? (
+            <>
+              <div className="mb-8 text-center md:text-left">
+                <h2 className="text-3xl font-bold mb-2">Transcription History</h2>
+                <p className="text-muted-foreground">Manage your previous voice recordings and texts.</p>
+              </div>
+
+              <div className="space-y-4">
+                {isLoadingHistory ? (
+                  <div className="flex items-center justify-center p-20">
+                    <Loader2 className="w-10 h-10 text-primary animate-spin" />
+                  </div>
+                ) : history.length > 0 ? (
+                  history.map((item, index) => (
+                    <motion.div
+                      key={item._id}
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      transition={{ delay: index * 0.05 }}
+                    >
+                      <Card className="border-border bg-card/40 hover:bg-card/60 backdrop-blur-sm transition-colors overflow-hidden">
+                        <div className="p-4 sm:p-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+                          <div className="grow min-w-0 w-full">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
+                                {new Date(item.createdAt).toLocaleDateString(undefined, {
+                                  month: 'short',
+                                  day: 'numeric',
+                                  year: 'numeric'
+                                })}
+                              </span>
+                              <span className="text-[10px] text-muted-foreground">
+                                {new Date(item.createdAt).toLocaleTimeString(undefined, {
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </div>
+                            <p className="text-sm text-foreground line-clamp-2 leading-relaxed">
+                              {item.transcribedText}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end sm:justify-start">
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0" 
+                              onClick={() => copyToClipboard(item.transcribedText)}
+                            >
+                              <Copy className="h-4 w-4" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-8 w-8 p-0 text-red-400 hover:text-red-500 hover:bg-red-500/10"
+                              onClick={() => deleteHistoryItem(item._id)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
+                        </div>
+                      </Card>
+                    </motion.div>
+                  ))
+                ) : (
+                  <Card className="border-dashed border-border p-20 text-center bg-transparent">
+                    <History className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+                    <p className="text-muted-foreground">No transcriptions found. Start recording to see them here!</p>
+                  </Card>
                 )}
               </div>
-            </Card>
-
-            {/* Result Area */}
-            <Card className="border-border bg-card/50 backdrop-blur-xl flex flex-col">
-              <CardHeader className="flex flex-row items-center justify-between border-b border-white/5">
-                <div>
-                  <CardTitle className="text-sm uppercase tracking-wider text-muted-foreground font-bold">Transcription Result</CardTitle>
-                </div>
-                <div className="flex gap-2">
-                  <Button variant="ghost" size="icon" onClick={copyToClipboard} title="Copy result">
-                    <Copy className="w-4 h-4 text-muted-foreground" />
-                  </Button>
-                  <Button variant="ghost" size="icon" onClick={clearTranscription} title="Clear">
-                    <Trash2 className="w-4 h-4 text-red-400 text-muted-foreground" />
-                  </Button>
-                </div>
-              </CardHeader>
-              <CardContent className="p-6 flex-1 min-h-[200px]">
-                {transcription ? (
-                  <motion.p 
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="text-lg leading-relaxed text-foreground"
-                  >
-                    {transcription}
-                  </motion.p>
-                ) : (
-                  <div className="h-full flex items-center justify-center text-muted-foreground italic">
-                    {isProcessing ? "Processing audio signal..." : "Transcription will appear here..."}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+            </>
+          ) : (
+            <div className="p-20 text-center">
+              <Settings className="w-12 h-12 text-muted-foreground/30 mx-auto mb-4" />
+              <h2 className="text-2xl font-bold mb-2">Settings</h2>
+              <p className="text-muted-foreground">Settings are coming soon in a future update.</p>
+            </div>
+          )}
         </section>
       </main>
     </div>

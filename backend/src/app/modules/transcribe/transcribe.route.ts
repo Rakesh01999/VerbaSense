@@ -11,4 +11,7 @@ router.post('/', [auth, upload.single('audio')], transcribeController.uploadAndT
 // @route   GET api/transcribe/history - Get user's transcription history
 router.get('/history', auth, transcribeController.getHistory);
 
+// @route   DELETE api/transcribe/:id - Delete a transcription
+router.delete('/:id', auth, transcribeController.deleteTranscription);
+
 export default router;

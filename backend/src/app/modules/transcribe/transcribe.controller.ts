@@ -46,3 +46,26 @@ export const getHistory = catchAsync(async (req: AuthRequest, res: Response) => 
         data: history
     });
 });
+
+export const deleteTranscription = catchAsync(async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    
+    const transcription = await Transcription.findOneAndDelete({
+        _id: id,
+        user: (req.user as any)?.id || req.user
+    });
+
+    if (!transcription) {
+        return res.status(404).json({
+            success: false,
+            message: 'Transcription not found or unauthorized'
+        });
+    }
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Transcription deleted successfully',
+        data: transcription
+    });
+});
