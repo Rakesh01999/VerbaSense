@@ -60,7 +60,7 @@ export default function DashboardPage() {
     setIsLoadingHistory(true)
     try {
       const token = localStorage.getItem('token')
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/transcribe/history`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transcribe/history`, {
         headers: { 'Authorization': `Bearer ${token}` }
       })
       const result = await response.json()
@@ -85,7 +85,7 @@ export default function DashboardPage() {
       onConfirm: async () => {
         try {
           const token = localStorage.getItem('token')
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/transcribe/${id}`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transcribe/${id}`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
           })
@@ -112,7 +112,7 @@ export default function DashboardPage() {
       onConfirm: async () => {
         try {
           const token = localStorage.getItem('token')
-          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/transcribe`, {
+          const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transcribe`, {
             method: 'DELETE',
             headers: { 'Authorization': `Bearer ${token}` }
           })
@@ -173,7 +173,7 @@ export default function DashboardPage() {
       formData.append('audio', audioBlob, 'recording.wav')
       formData.append('language', transcriptionLanguage)
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/transcribe`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transcribe`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`

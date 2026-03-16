@@ -66,7 +66,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!currentToken) return
 
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
         headers: {
           'Authorization': `Bearer ${currentToken}`
         }
@@ -90,7 +90,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const decoded = decodeUser(storedToken)
       if (decoded) {
         setToken(storedToken)
-        // Try to fetch newest data from backend
+        if (storedUser) {
+          try {
+            setUser(JSON.parse(storedUser))
+          } catch (e) {
+            console.error('Error parsing stored user:', e)
+          }
+        }
+        // Background refresh to get latest data
         refreshUser()
       } else {
         localStorage.removeItem('token')
