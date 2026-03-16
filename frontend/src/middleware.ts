@@ -2,9 +2,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // Routes that require authentication
-const PROTECTED = ['/dashboard']
+const PROTECTED = ['/dashboard', '/profile']
 // Routes that should redirect authenticated users away
-const AUTH_ROUTES = ['/login', '/register', '/forgot-password', '/reset-password']
+const AUTH_ROUTES = ['/login', '/register']
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
