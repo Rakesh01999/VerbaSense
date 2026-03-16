@@ -1,23 +1,69 @@
 "use client"
 
-import React from "react"
-import { motion } from "framer-motion"
+import React, { useState } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 import { useAuth } from "@/context/AuthContext"
 import BackgroundEffects from "@/components/BackgroundEffects"
 import PageHero from "@/components/PageHero"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Mail, Shield, Zap, BarChart3, Clock, KeyRound, LogOut } from "lucide-react"
+import { Mail, Shield, Zap, BarChart3, Clock, KeyRound, LogOut, Edit2, Check, X, Loader2 } from "lucide-react"
 import Link from "next/link"
+import { useToast } from "@/context/ToastContext"
 
 export default function ProfilePage() {
-  const { user, stats, logout, isLoading } = useAuth()
+  const { user, stats, logout, isLoading, refreshUser, token } = useAuth()
+  const { showToast } = useToast()
+  
+  const [isEditing, setIsEditing] = useState(false)
+  const [name, setName] = useState(user?.name || "")
+  const [isUpdating, setIsUpdating] = useState(false)
 
   const statsDisplay = [
     { label: "Minutes Processed", value: stats?.totalMinutes || "0", icon: <Clock className="w-5 h-5 text-blue-500" /> },
     { label: "Success Rate", value: `${stats?.averageAccuracy || "99.8"}%`, icon: <Zap className="w-5 h-5 text-yellow-500" /> },
     { label: "Total Files", value: stats?.totalTranscriptions || "0", icon: <BarChart3 className="w-5 h-5 text-purple-500" /> },
   ]
+
+  const handleUpdateProfile = async () => {
+    if (!name.trim()) {
+      showToast("Name cannot be empty", "error")
+      return
+    }
+
+    setIsUpdating(true)
+    try {
+      // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ name })
+      })
+
+      const result = await response.json()
+
+      if (result.success) {
+        await refreshUser()
+        setIsEditing(false)
+        showToast("Profile updated successfully", "success")
+      } else {
+        showToast(result.message || "Failed to update profile", "error")
+      }
+    } catch (error) {
+      console.error('Error updating profile:', error)
+      showToast("An error occurred while updating profile", "error")
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
+  const cancelEditing = () => {
+    setName(user?.name || "")
+    setIsEditing(false)
+  }
 
   if (isLoading) {
     return (
@@ -51,22 +97,90 @@ export default function ProfilePage() {
             <Card className="bg-card/40 backdrop-blur-2xl border-border shadow-2xl overflow-hidden h-fit">
               <div className="h-24 bg-gradient-to-r from-purple-600/20 to-blue-600/20 relative" />
               <div className="px-8 pb-8 -mt-12 relative">
-                <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-4xl font-bold shadow-xl border-4 border-background mb-6">
-                  {(user.name?.[0] || user.email?.[0] || "U").toUpperCase()}
+                <div className="flex justify-between items-start mb-6">
+                  <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-4xl font-bold shadow-xl border-4 border-background">
+                    {(user.name?.[0] || user.email?.[0] || "U").toUpperCase()}
+                  </div>
+                  {!isEditing ? (
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="rounded-full hover:bg-purple-500/10 text-purple-400"
+                      onClick={() => setIsEditing(true)}
+                    >
+                      <Edit2 className="w-4 h-4" />
+                    </Button>
+                  ) : null}
                 </div>
                 
                 <div className="space-y-4">
                   <div>
-                    <h2 className="text-2xl font-bold tracking-tight">{user.name || "VerbaSense User"}</h2>
-                    <p className="text-muted-foreground flex items-center gap-2 mt-1 italic text-sm">
-                      Joined {user.date ? new Date(user.date).toLocaleDateString() : 'Active Member'}
-                    </p>
-                    <p className="text-muted-foreground flex items-center gap-2 mt-2 text-sm">
-                      <Mail className="w-4 h-4" /> {user.email}
-                    </p>
+                    <AnimatePresence mode="wait">
+                      {isEditing ? (
+                        <motion.div
+                          key="editing"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                          className="space-y-3"
+                        >
+                          <div className="space-y-1">
+                            <label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Full Name</label>
+                            <input 
+                              type="text"
+                              value={name}
+                              onChange={(e) => setName(e.target.value)}
+                              className="w-full bg-background/50 border border-purple-500/30 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-purple-500/50 transition-all font-semibold"
+                              placeholder="Enter your name"
+                              autoFocus
+                            />
+                          </div>
+                          <div className="flex gap-2">
+                            <Button 
+                              size="sm" 
+                              className="flex-1 rounded-xl bg-purple-600 hover:bg-purple-700 text-white gap-2"
+                              onClick={handleUpdateProfile}
+                              disabled={isUpdating}
+                            >
+                              {isUpdating ? <Loader2 className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                              Save
+                            </Button>
+                            <Button 
+                              size="sm" 
+                              variant="outline" 
+                              className="flex-1 rounded-xl border-border hover:bg-accent gap-2"
+                              onClick={cancelEditing}
+                              disabled={isUpdating}
+                            >
+                              <X className="w-4 h-4" />
+                              Cancel
+                            </Button>
+                          </div>
+                        </motion.div>
+                      ) : (
+                        <motion.div
+                          key="display"
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -10 }}
+                        >
+                          <h2 className="text-2xl font-bold tracking-tight">{user.name || "VerbaSense User"}</h2>
+                          <p className="text-muted-foreground flex items-center gap-2 mt-1 italic text-sm">
+                            Joined {user.date ? new Date(user.date).toLocaleDateString() : 'Active Member'}
+                          </p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                    
+                    <div className="mt-4 pt-4 border-t border-border/50">
+                      <p className="text-xs font-medium text-muted-foreground uppercase tracking-wider mb-1">Email Address</p>
+                      <p className="text-muted-foreground flex items-center gap-2 text-sm">
+                        <Mail className="w-4 h-4" /> {user.email}
+                      </p>
+                    </div>
                   </div>
 
-                  <div className="pt-4 border-t border-border flex flex-col gap-2">
+                  <div className="pt-4 flex flex-col gap-2">
                     <Button asChild variant="outline" className="w-full justify-start gap-3 rounded-xl hover:bg-accent border-purple-500/20">
                       <Link href="/forgot-password">
                         <KeyRound className="w-4 h-4 text-purple-400" /> Update Password
