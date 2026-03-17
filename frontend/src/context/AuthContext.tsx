@@ -123,6 +123,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem('user', JSON.stringify(fullUser))
     // Set cookie for middleware-level route protection
     document.cookie = `token=${newToken}; path=/; max-age=${60 * 60}; SameSite=Lax`
+    
+    // Refresh user data immediately to get full profile and stats
+    refreshUser()
+    
     router.push('/dashboard')
   }
 

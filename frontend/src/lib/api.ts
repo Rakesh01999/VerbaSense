@@ -45,6 +45,13 @@ export async function apiLogin(email: string, password: string) {
   })
 }
 
+export async function apiGoogleLogin(credential: string) {
+  return request<{ token: string }>("/auth/google-login", {
+    method: "POST",
+    body: JSON.stringify({ credential }),
+  })
+}
+
 export async function apiForgotPassword(email: string) {
   return request<null>("/auth/forgot-password", {
     method: "POST",

@@ -10,7 +10,8 @@ import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mic, Loader2 } from "lucide-react"
-import { apiLogin } from "@/lib/api"
+import { apiLogin, apiGoogleLogin } from "@/lib/api"
+import { GoogleLogin } from "@react-oauth/google"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -32,6 +33,25 @@ export default function LoginPage() {
         showToast(err.message, "error")
       } else {
         showToast("An unexpected error occurred. Please try again.", "error")
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    if (!credentialResponse.credential) return
+    
+    setIsLoading(true)
+    try {
+      const res = await apiGoogleLogin(credentialResponse.credential)
+      login(res.data.token)
+      showToast("Signed in successfully with Google!", "success")
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        showToast(err.message, "error")
+      } else {
+        showToast("Google authentication failed. Please try again.", "error")
       }
     } finally {
       setIsLoading(false)
@@ -95,6 +115,26 @@ export default function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   disabled={isLoading}
+                />
+              </div>
+
+              <div className="relative py-2">
+                <div className="absolute inset-0 flex items-center">
+                  <span className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center text-xs uppercase">
+                  <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                </div>
+              </div>
+
+              <div className="flex justify-center w-full">
+                <GoogleLogin
+                  onSuccess={handleGoogleSuccess}
+                  onError={() => showToast("Google Login failed", "error")}
+                  useOneTap
+                  theme="filled_blue"
+                  shape="pill"
+                  width="100%"
                 />
               </div>
             </CardContent>

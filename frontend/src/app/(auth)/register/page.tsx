@@ -9,7 +9,9 @@ import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Mic, UserPlus, Loader2, CheckCircle2 } from "lucide-react"
-import { apiRegister } from "@/lib/api"
+import { apiRegister, apiGoogleLogin } from "@/lib/api"
+import { GoogleLogin } from "@react-oauth/google"
+import { useAuth } from "@/context/AuthContext"
 
 export default function RegisterPage() {
   const [name, setName] = useState("")
@@ -17,6 +19,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const { login } = useAuth()
   const { showToast } = useToast()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,6 +41,25 @@ export default function RegisterPage() {
         showToast(err.message, "error")
       } else {
         showToast("An unexpected error occurred. Please try again.", "error")
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+  
+  const handleGoogleSuccess = async (credentialResponse: any) => {
+    if (!credentialResponse.credential) return
+    
+    setIsLoading(true)
+    try {
+      const res = await apiGoogleLogin(credentialResponse.credential)
+      login(res.data.token)
+      showToast("Account signed in successfully with Google!", "success")
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        showToast(err.message, "error")
+      } else {
+        showToast("Google authentication failed. Please try again.", "error")
       }
     } finally {
       setIsLoading(false)
@@ -127,6 +149,26 @@ export default function RegisterPage() {
                       onChange={(e) => setPassword(e.target.value)}
                       required
                       disabled={isLoading}
+                    />
+                  </div>
+
+                  <div className="relative py-2">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t border-border" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">Or continue with</span>
+                    </div>
+                  </div>
+
+                  <div className="flex justify-center w-full">
+                    <GoogleLogin
+                      onSuccess={handleGoogleSuccess}
+                      onError={() => showToast("Google Login failed", "error")}
+                      useOneTap
+                      theme="filled_blue"
+                      shape="pill"
+                      width="100%"
                     />
                   </div>
                 </CardContent>
