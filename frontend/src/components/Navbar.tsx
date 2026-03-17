@@ -38,6 +38,16 @@ export default function Navbar() {
     showToast("Signed out successfully. See you soon!", "info")
   }
 
+  const getPhotoUrl = (photoPath?: string) => {
+    if (!photoPath) return null
+    if (photoPath.startsWith("http")) return photoPath
+    
+    // For local uploads, we need to point to the backend static folder
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+    const baseUrl = apiBase.replace("/api", "")
+    return `${baseUrl}/${photoPath}`
+  }
+
   const navLinks = [
     { name: "Product", href: "/product" },
     { name: "Features", href: "/features" },
@@ -91,8 +101,12 @@ export default function Navbar() {
                 className="flex items-center gap-2 p-1 pl-3 rounded-full bg-secondary border border-border hover:bg-muted transition-colors"
               >
                 <span className="text-sm font-medium text-foreground">{user?.name || user?.email?.split('@')[0]}</span>
-                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-xs font-bold">
-                  {(user?.name?.[0] || user?.email?.[0] || "U").toUpperCase()}
+                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-xs font-bold overflow-hidden border border-white/10 shadow-inner">
+                  {user?.photo ? (
+                    <img src={getPhotoUrl(user.photo) || ""} alt={user.name || "User"} className="w-full h-full object-cover" />
+                  ) : (
+                    (user?.name?.[0] || user?.email?.[0] || "U").toUpperCase()
+                  )}
                 </div>
                 <ChevronDown className={`w-4 h-4 text-zinc-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
               </button>

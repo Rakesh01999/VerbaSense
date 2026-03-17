@@ -30,12 +30,20 @@ async function request<T>(
 }
 
 // ─── Auth Endpoints ──────────────────────────────────────────────────
-
-export async function apiRegister(name: string, email: string, password: string) {
-  return request<null>("/auth/register", {
+// backend sends { message: "..." } on errors
+export async function apiRegister(formData: FormData) {
+  const res = await fetch(`${API_BASE}/auth/register`, {
     method: "POST",
-    body: JSON.stringify({ name, email, password }),
+    body: formData,
   })
+
+  const json = await res.json()
+
+  if (!res.ok) {
+    throw new Error(json.message || "Something went wrong")
+  }
+
+  return json as ApiResponse<null>
 }
 
 export async function apiLogin(email: string, password: string) {

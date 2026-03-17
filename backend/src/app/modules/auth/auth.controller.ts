@@ -28,7 +28,8 @@ export const register = catchAsync(async (req: Request, res: Response) => {
         name,
         email,
         password,
-        verificationToken
+        verificationToken,
+        photo: req.file ? `uploads/profiles/${req.file.filename}` : undefined
     });
 
     await user.save();
@@ -216,7 +217,7 @@ export const googleLogin = catchAsync(async (req: Request, res: Response) => {
         throw new AppError(400, 'Invalid Google token');
     }
 
-    const { email, name, sub: googleId } = payload;
+    const { email, name, sub: googleId, picture: photo } = payload;
 
     let user = await User.findOne({ email });
 
@@ -226,6 +227,7 @@ export const googleLogin = catchAsync(async (req: Request, res: Response) => {
             user.googleId = googleId;
             // Also mark as verified if it was Google login
             user.isVerified = true;
+            if (photo && !user.photo) user.photo = photo;
             await user.save();
         }
     } else {
@@ -235,6 +237,7 @@ export const googleLogin = catchAsync(async (req: Request, res: Response) => {
             email,
             googleId,
             isVerified: true, // Google accounts are implicitly verified
+            photo
         });
         await user.save();
     }

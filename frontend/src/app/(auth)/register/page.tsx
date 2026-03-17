@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mic, UserPlus, Loader2, CheckCircle2 } from "lucide-react"
+import { Mic, UserPlus, Loader2, CheckCircle2, Camera, X } from "lucide-react"
 import { apiRegister, apiGoogleLogin } from "@/lib/api"
 import { GoogleLogin } from "@react-oauth/google"
 import { useAuth } from "@/context/AuthContext"
@@ -19,8 +19,31 @@ export default function RegisterPage() {
   const [password, setPassword] = useState("")
   const [isLoading, setIsLoading] = useState(false)
   const [isSuccess, setIsSuccess] = useState(false)
+  const [photo, setPhoto] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const { login } = useAuth()
   const { showToast } = useToast()
+  
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("Image size must be less than 5MB.", "error")
+        return
+      }
+      setPhoto(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const removePhoto = () => {
+    setPhoto(null)
+    setPhotoPreview(null)
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -33,7 +56,15 @@ export default function RegisterPage() {
     setIsLoading(true)
 
     try {
-      await apiRegister(name, email, password)
+      const formData = new FormData()
+      formData.append("name", name)
+      formData.append("email", email)
+      formData.append("password", password)
+      if (photo) {
+        formData.append("photo", photo)
+      }
+
+      await apiRegister(formData)
       setIsSuccess(true)
       showToast("Account created! Check your inbox for the verification link.", "success")
     } catch (err: unknown) {
@@ -113,6 +144,40 @@ export default function RegisterPage() {
               </CardHeader>
               <form onSubmit={handleSubmit}>
                 <CardContent className="space-y-4">
+                  
+                  {/* Photo Upload Section */}
+                  <div className="flex flex-col items-center gap-4 mb-2">
+                    <Label className="text-foreground/80 self-start">Profile Photo (Optional)</Label>
+                    <div className="relative group">
+                      <div className="w-24 h-24 rounded-full bg-secondary/50 border-2 border-dashed border-border flex items-center justify-center overflow-hidden transition-all group-hover:border-purple-500/50">
+                        {photoPreview ? (
+                          <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                        ) : (
+                          <Camera className="w-8 h-8 text-muted-foreground group-hover:text-purple-500/50 transition-colors" />
+                        )}
+                      </div>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="absolute inset-0 opacity-0 cursor-pointer" 
+                        onChange={handlePhotoChange}
+                        disabled={isLoading}
+                      />
+                      {photoPreview && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault()
+                            removePhoto()
+                          }}
+                          className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-1 shadow-lg hover:bg-destructive/90 transition-colors"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">JPG, PNG or WEBP. Max 5MB.</p>
+                  </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="name" className="text-foreground/80">Full Name</Label>

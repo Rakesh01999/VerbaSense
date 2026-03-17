@@ -9,6 +9,7 @@ interface User {
   email: string
   name?: string
   date?: string
+  photo?: string
 }
 
 interface UserStats {

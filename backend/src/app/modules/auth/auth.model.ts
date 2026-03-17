@@ -11,6 +11,7 @@ export interface IUser extends Document {
     verificationToken?: string;
     resetPasswordToken?: string;
     resetPasswordExpires?: Date;
+    photo?: string;
 }
 
 const UserSchema: Schema = new Schema({
@@ -48,6 +49,10 @@ const UserSchema: Schema = new Schema({
     },
     resetPasswordExpires: {
         type: Date
+    },
+    photo: {
+        type: String,
+        required: false
     }
 });
 
