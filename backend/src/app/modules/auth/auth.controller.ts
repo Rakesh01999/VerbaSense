@@ -227,7 +227,13 @@ export const googleLogin = catchAsync(async (req: Request, res: Response) => {
             user.googleId = googleId;
             // Also mark as verified if it was Google login
             user.isVerified = true;
-            if (photo && !user.photo) user.photo = photo;
+        }
+        // Always update photo if it's missing
+        if (photo && !user.photo) {
+            user.photo = photo;
+        }
+        
+        if (user.isModified()) {
             await user.save();
         }
     } else {
