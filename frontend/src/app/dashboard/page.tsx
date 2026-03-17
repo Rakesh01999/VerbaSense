@@ -405,6 +405,32 @@ export default function DashboardPage() {
                         {isRecording ? "Tap to finish transcription" : "Your voice patterns will be processed securely"}
                       </p>
                     </div>
+                    
+                    {/* Quick Language Toggle */}
+                    <div className="mt-6 flex bg-muted/50 p-1 rounded-xl border border-white/5 relative z-20">
+                      <button
+                        type="button"
+                        onClick={() => setTranscriptionLanguage("en")}
+                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                          transcriptionLanguage === "en" 
+                          ? "bg-primary text-primary-foreground shadow-lg" 
+                          : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        English
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setTranscriptionLanguage("bn")}
+                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                          transcriptionLanguage === "bn" 
+                          ? "bg-primary text-primary-foreground shadow-lg" 
+                          : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Bengali
+                      </button>
+                    </div>
 
                     {isRecording && (
                       <div className="mt-6 flex items-center gap-1">
@@ -570,12 +596,13 @@ export default function DashboardPage() {
                       className="bg-muted/30 border border-white/10 rounded-lg p-2 focus:ring-2 focus:ring-primary/50 outline-none"
                     >
                       <option value="en">English (US/UK)</option>
+                      <option value="bn">Bengali</option>
                       <option value="es">Spanish</option>
                       <option value="fr">French</option>
                       <option value="de">German</option>
                       <option value="auto">Auto-detect</option>
                     </select>
-                    <p className="text-[10px] text-muted-foreground italic">Note: Whisper engine currently optimized for English.</p>
+                    <p className="text-[10px] text-muted-foreground italic">Note: Multilingual support enabled (Whisper Base model).</p>
                   </div>
                 </div>
               </Card>

@@ -12,7 +12,7 @@ export const uploadAndTranscribe = catchAsync(async (req: AuthRequest, res: Resp
 
     const audioPath = req.file.path;
     const language = req.body.language || 'en';
-    const transcribedText = await transcribeAudio(audioPath);
+    const transcribedText = await transcribeAudio(audioPath, language);
 
     const newTranscription = new Transcription({
         user: (req.user as any)?.id || req.user,

@@ -10,7 +10,8 @@ if (ffmpegPath) {
 }
 
 const WHISPER_PATH = process.env.WHISPER_PATH || path.join(__dirname, '../../../../bin/whisper-cli.exe');
-const MODEL_PATH = process.env.MODEL_PATH || path.join(__dirname, '../../../../bin/ggml-base.en.bin');
+const MODEL_PATH_EN = process.env.MODEL_PATH_EN || path.join(__dirname, '../../../../bin/ggml-base.en.bin');
+const MODEL_PATH_MULTI = process.env.MODEL_PATH_MULTI || path.join(__dirname, '../../../../bin/ggml-small.bin');
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, '../../../../uploads');
@@ -46,7 +47,7 @@ const convertToWhisperFormat = (inputPath: string): Promise<string> => {
     });
 };
 
-export const transcribeAudio = async (audioPath: string): Promise<string> => {
+export const transcribeAudio = async (audioPath: string, language: string = 'en'): Promise<string> => {
     let convertedPath: string | null = null;
     
     try {
@@ -55,9 +56,13 @@ export const transcribeAudio = async (audioPath: string): Promise<string> => {
             return "Error: Whisper binary not found. Please ensure all DLLs are extracted and main.exe is in backend/bin.";
         }
 
-        if (!fs.existsSync(MODEL_PATH)) {
-            console.warn(`[Whisper] Model not found at ${MODEL_PATH}`);
-            return "Error: Whisper model not found. Please place ggml-base.en.bin in backend/bin.";
+        // Use multilingual model for Bengali or any other non-English language
+        const modelPath = language === 'en' ? MODEL_PATH_EN : MODEL_PATH_MULTI;
+
+        if (!fs.existsSync(modelPath)) {
+            console.warn(`[Whisper] Model not found at ${modelPath}`);
+            const modelName = path.basename(modelPath);
+            return `Error: Whisper model not found. Please place ${modelName} in backend/bin.`;
         }
 
         // 1. Convert to required format
@@ -66,9 +71,17 @@ export const transcribeAudio = async (audioPath: string): Promise<string> => {
 
         // 2. Prepare command
         const binDir = path.dirname(WHISPER_PATH);
-        const relativeModelPath = path.relative(binDir, MODEL_PATH);
+        const relativeModelPath = path.relative(binDir, modelPath);
         const relativeAudioPath = path.relative(binDir, absoluteAudioPath);
-        const command = `whisper-cli.exe -m "${relativeModelPath}" -f "${relativeAudioPath}" -nt`;
+        
+        // Add language flag if specified
+        const languageFlag = language !== 'en' ? `-l ${language}` : '';
+        // Add a prompt to encourage the model to use the correct script for non-English languages
+        const promptFlag = language === 'bn' ? '--prompt "বাংলা"' : '';
+        
+        const command = `whisper-cli.exe -m "${relativeModelPath}" -f "${relativeAudioPath}" ${languageFlag} ${promptFlag} -nt -np`;
+
+        console.log(`[Whisper] Executing: ${command}`);
 
         // 3. Execute transcription
         const transcribedText = await new Promise<string>((resolve, reject) => {
@@ -78,8 +91,8 @@ export const transcribeAudio = async (audioPath: string): Promise<string> => {
                     return reject(new Error(`Transcription failed: ${error.message}`));
                 }
                 
-                if (stderr && !stdout) {
-                    console.warn(`[Whisper] Stderr: ${stderr}`);
+                if (stderr) {
+                    console.log(`[Whisper] Info: ${stderr}`);
                 }
 
                 resolve(stdout.trim());
