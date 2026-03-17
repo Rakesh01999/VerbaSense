@@ -4,7 +4,7 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 import { useRouter } from 'next/navigation'
 import { jwtDecode } from 'jwt-decode'
 
-interface User {
+export interface User {
   id: string
   email: string
   name?: string

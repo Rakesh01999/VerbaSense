@@ -30,6 +30,6 @@ router.post('/forgot-password', authController.forgotPassword);
 router.post('/reset-password/:token', authController.resetPassword);
 
 // @route   PATCH api/auth/me
-router.patch('/me', auth, authController.updateMe);
+router.patch('/me', auth, uploadProfilePhoto.single('photo'), authController.updateMe);
 
 export default router;

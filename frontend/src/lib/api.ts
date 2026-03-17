@@ -1,5 +1,6 @@
 // Centralized API service for VerbaSense backend
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+import { User } from "@/context/AuthContext"
 
 interface ApiResponse<T = null> {
   success: boolean
@@ -31,6 +32,24 @@ async function request<T>(
 
 // ─── Auth Endpoints ──────────────────────────────────────────────────
 // backend sends { message: "..." } on errors
+export async function apiUpdateProfile(formData: FormData, token: string) {
+  const res = await fetch(`${API_BASE}/auth/me`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+    body: formData,
+  })
+
+  const json = await res.json()
+
+  if (!res.ok) {
+    throw new Error(json.message || "Failed to update profile")
+  }
+
+  return json as ApiResponse<User>
+}
+
 export async function apiRegister(formData: FormData) {
   const res = await fetch(`${API_BASE}/auth/register`, {
     method: "POST",

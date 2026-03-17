@@ -293,24 +293,28 @@ export const getMe = catchAsync(async (req: any, res: Response) => {
 export const updateMe = catchAsync(async (req: any, res: Response) => {
     const { name } = req.body;
 
-    if (!name) {
-        throw new AppError(400, 'Name is required');
-    }
-
-    const user = await User.findByIdAndUpdate(
-        req.user.id,
-        { name },
-        { new: true, runValidators: true }
-    ).select('-password');
+    const user = await User.findById(req.user.id);
 
     if (!user) {
         throw new AppError(404, 'User not found');
     }
 
+    if (name) {
+        user.name = name;
+    }
+
+    if (req.file) {
+        user.photo = `uploads/profiles/${req.file.filename}`;
+    }
+
+    await user.save();
+
+    const updatedUser = await User.findById(user.id).select('-password');
+
     sendResponse(res, {
         statusCode: 200,
         success: true,
         message: 'Profile updated successfully',
-        data: user
+        data: updatedUser
     });
 });

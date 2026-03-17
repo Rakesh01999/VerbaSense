@@ -7,7 +7,8 @@ import BackgroundEffects from "@/components/BackgroundEffects"
 import PageHero from "@/components/PageHero"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Mail, Shield, Zap, BarChart3, Clock, KeyRound, LogOut, Edit2, Check, X, Loader2 } from "lucide-react"
+import { Mail, Shield, Zap, BarChart3, Clock, KeyRound, LogOut, Edit2, Check, X, Loader2, Camera, Calendar } from "lucide-react"
+import { apiUpdateProfile } from "@/lib/api"
 import Link from "next/link"
 import { useToast } from "@/context/ToastContext"
 
@@ -17,7 +18,34 @@ export default function ProfilePage() {
   
   const [isEditing, setIsEditing] = useState(false)
   const [name, setName] = useState(user?.name || "")
+  const [photoFile, setPhotoFile] = useState<File | null>(null)
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
+
+  const getPhotoUrl = (photoPath?: string) => {
+    if (!photoPath) return null
+    if (photoPath.startsWith("http")) return photoPath
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+    const baseUrl = apiBase.replace("/api", "")
+    return `${baseUrl}/${photoPath}`
+  }
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        showToast("Image size must be less than 5MB.", "error")
+        return
+      }
+      setPhotoFile(file)
+      const reader = new FileReader()
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result as string)
+      }
+      reader.readAsDataURL(file)
+      setIsEditing(true)
+    }
+  }
 
   const statsDisplay = [
     { label: "Minutes Processed", value: stats?.totalMinutes || "0", icon: <Clock className="w-5 h-5 text-blue-500" /> },
@@ -26,28 +54,25 @@ export default function ProfilePage() {
   ]
 
   const handleUpdateProfile = async () => {
-    if (!name.trim()) {
-      showToast("Name cannot be empty", "error")
+    if (!name.trim() && !photoFile) {
+      showToast("No changes to update", "info")
       return
     }
 
     setIsUpdating(true)
     try {
-      // const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/me`, {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/me`, {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ name })
-      })
+      const formData = new FormData()
+      if (name !== user?.name) formData.append("name", name)
+      if (photoFile) formData.append("photo", photoFile)
 
-      const result = await response.json()
+      if (!token) throw new Error("No auth token found")
+      const result = await apiUpdateProfile(formData, token)
 
       if (result.success) {
         await refreshUser()
         setIsEditing(false)
+        setPhotoFile(null)
+        setPhotoPreview(null)
         showToast("Profile updated successfully", "success")
       } else {
         showToast(result.message || "Failed to update profile", "error")
@@ -62,6 +87,8 @@ export default function ProfilePage() {
 
   const cancelEditing = () => {
     setName(user?.name || "")
+    setPhotoFile(null)
+    setPhotoPreview(null)
     setIsEditing(false)
   }
 
@@ -98,8 +125,22 @@ export default function ProfilePage() {
               <div className="h-24 bg-gradient-to-r from-purple-600/20 to-blue-600/20 relative" />
               <div className="px-8 pb-8 -mt-12 relative">
                 <div className="flex justify-between items-start mb-6">
-                  <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-4xl font-bold shadow-xl border-4 border-background">
-                    {(user.name?.[0] || user.email?.[0] || "U").toUpperCase()}
+                  <div className="relative group">
+                    <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-4xl font-bold shadow-xl border-4 border-background overflow-hidden">
+                      {photoPreview || user.photo ? (
+                        <img 
+                          src={photoPreview || getPhotoUrl(user.photo) || ""} 
+                          alt={user.name} 
+                          className="w-full h-full object-cover" 
+                        />
+                      ) : (
+                        (user.name?.[0] || user.email?.[0] || "U").toUpperCase()
+                      )}
+                    </div>
+                    <label className="absolute bottom-0 right-0 w-8 h-8 rounded-full bg-purple-600 border-2 border-background flex items-center justify-center cursor-pointer hover:bg-purple-500 transition-colors shadow-lg">
+                      <Camera className="w-4 h-4 text-white" />
+                      <input type="file" accept="image/*" className="hidden" onChange={handlePhotoChange} />
+                    </label>
                   </div>
                   {!isEditing ? (
                     <Button 
@@ -165,9 +206,11 @@ export default function ProfilePage() {
                           exit={{ opacity: 0, y: -10 }}
                         >
                           <h2 className="text-2xl font-bold tracking-tight">{user.name || "VerbaSense User"}</h2>
-                          <p className="text-muted-foreground flex items-center gap-2 mt-1 italic text-sm">
-                            Joined {user.date ? new Date(user.date).toLocaleDateString() : 'Active Member'}
-                          </p>
+                          <div className="flex flex-col gap-1 mt-1">
+                            <p className="text-muted-foreground flex items-center gap-2 italic text-sm">
+                              <Calendar className="w-3.5 h-3.5" /> Joined {user.date ? new Date(user.date).toLocaleDateString() : 'Active Member'}
+                            </p>
+                          </div>
                         </motion.div>
                       )}
                     </AnimatePresence>
