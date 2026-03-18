@@ -421,8 +421,19 @@ export default function DashboardPage() {
                       </button>
                       <button
                         type="button"
+                        onClick={() => setTranscriptionLanguage("hi")}
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                          transcriptionLanguage === "hi" 
+                          ? "bg-primary text-primary-foreground shadow-lg" 
+                          : "text-muted-foreground hover:text-foreground"
+                        }`}
+                      >
+                        Hindi
+                      </button>
+                      <button
+                        type="button"
                         onClick={() => setTranscriptionLanguage("bn")}
-                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                           transcriptionLanguage === "bn" 
                           ? "bg-primary text-primary-foreground shadow-lg" 
                           : "text-muted-foreground hover:text-foreground"
@@ -595,14 +606,12 @@ export default function DashboardPage() {
                       onChange={(e) => setTranscriptionLanguage(e.target.value)}
                       className="bg-muted/30 border border-white/10 rounded-lg p-2 focus:ring-2 focus:ring-primary/50 outline-none"
                     >
-                      <option value="en">English (US/UK)</option>
+                      <option value="en">English (Global)</option>
+                      <option value="hi">Hindi (India)</option>
                       <option value="bn">Bengali</option>
-                      <option value="es">Spanish</option>
-                      <option value="fr">French</option>
-                      <option value="de">German</option>
                       <option value="auto">Auto-detect</option>
                     </select>
-                    <p className="text-[10px] text-muted-foreground italic">Note: Multilingual support enabled (Whisper Base model).</p>
+                    <p className="text-[10px] text-muted-foreground italic">Note: Multilingual support enabled (Whisper Medium model).</p>
                   </div>
                 </div>
               </Card>

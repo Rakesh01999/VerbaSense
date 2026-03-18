@@ -11,7 +11,7 @@ if (ffmpegPath) {
 
 const WHISPER_PATH = process.env.WHISPER_PATH || path.join(__dirname, '../../../../bin/whisper-cli.exe');
 const MODEL_PATH_EN = process.env.MODEL_PATH_EN || path.join(__dirname, '../../../../bin/ggml-base.en.bin');
-const MODEL_PATH_MULTI = process.env.MODEL_PATH_MULTI || path.join(__dirname, '../../../../bin/ggml-small.bin');
+const MODEL_PATH_MULTI = process.env.MODEL_PATH_MULTI || path.join(__dirname, '../../../../bin/ggml-medium.bin');
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, '../../../../uploads');
@@ -74,16 +74,16 @@ export const transcribeAudio = async (audioPath: string, language: string = 'en'
         const relativeModelPath = path.relative(binDir, modelPath);
         const relativeAudioPath = path.relative(binDir, absoluteAudioPath);
         
-        // Add language flag if specified
+        // Use a unique output filename to avoid collisions
+        // Prepare command string
         const languageFlag = language !== 'en' ? `-l ${language}` : '';
-        // Add a prompt to encourage the model to use the correct script for non-English languages
-        const promptFlag = language === 'bn' ? '--prompt "বাংলা"' : '';
         
-        const command = `whisper-cli.exe -m "${relativeModelPath}" -f "${relativeAudioPath}" ${languageFlag} ${promptFlag} -nt -np`;
+        // Simple command without prompts or complex shells to avoid mangling
+        const command = `whisper-cli.exe -m "${relativeModelPath}" -f "${relativeAudioPath}" ${languageFlag} -nt -np`;
 
         console.log(`[Whisper] Executing: ${command}`);
 
-        // 3. Execute transcription
+        // 3. Execute transcription using simple exec
         const transcribedText = await new Promise<string>((resolve, reject) => {
             exec(command, { cwd: binDir }, (error, stdout, stderr) => {
                 if (error) {
@@ -95,7 +95,11 @@ export const transcribeAudio = async (audioPath: string, language: string = 'en'
                     console.log(`[Whisper] Info: ${stderr}`);
                 }
 
-                resolve(stdout.trim());
+                const trimmedContent = stdout.trim();
+                console.log(`[Whisper] Result length: ${trimmedContent.length}`);
+                console.log(`[Whisper] Result hex: ${Buffer.from(trimmedContent).toString('hex')}`);
+
+                resolve(trimmedContent);
             });
         });
 
