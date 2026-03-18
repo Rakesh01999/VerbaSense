@@ -30,6 +30,9 @@ export default function DashboardPage() {
   const [history, setHistory] = useState<TranscriptionItem[]>([])
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [selectedFile, setSelectedFile] = useState<File | null>(null)
+  const [uploadProgress, setUploadProgress] = useState(0)
+  const fileInputRef = React.useRef<HTMLInputElement>(null)
   
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean;
@@ -170,7 +173,8 @@ export default function DashboardPage() {
     try {
       const token = localStorage.getItem('token')
       const formData = new FormData()
-      formData.append('audio', audioBlob, 'recording.wav')
+      const fileName = audioBlob instanceof File ? audioBlob.name : 'recording.wav'
+      formData.append('audio', audioBlob, fileName)
       formData.append('language', transcriptionLanguage)
 
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transcribe`, {
@@ -443,6 +447,79 @@ export default function DashboardPage() {
                         ))}
                       </div>
                     )}
+
+                    {/* File Upload Option */}
+                    <div className="mt-10 w-full max-w-md">
+                      <div className="relative border-t border-white/10 pt-8 mt-4 flex flex-col items-center">
+                        <span className="absolute -top-3 px-4 bg-muted/30 text-[10px] uppercase tracking-widest text-muted-foreground font-bold">OR</span>
+                        
+                        <input
+                          type="file"
+                          ref={fileInputRef}
+                          onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                          className="hidden"
+                          accept="audio/*"
+                        />
+                        
+                        {!selectedFile ? (
+                          <Button
+                            variant="outline"
+                            className="w-full h-14 border-dashed border-white/20 hover:border-primary/50 hover:bg-primary/5 group"
+                            onClick={() => fileInputRef.current?.click()}
+                            disabled={isRecording || isProcessing}
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+                                <History className="w-4 h-4 rotate-180" />
+                              </div>
+                              <div className="text-left">
+                                <p className="text-sm font-semibold">Upload Audio File</p>
+                                <p className="text-[10px] text-muted-foreground">MP3, WAV, M4A up to 50MB</p>
+                              </div>
+                            </div>
+                          </Button>
+                        ) : (
+                          <div className="w-full space-y-4">
+                            <div className="flex items-center justify-between p-4 rounded-xl bg-primary/10 border border-primary/20">
+                              <div className="flex items-center gap-3 overflow-hidden">
+                                <div className="w-10 h-10 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
+                                  <Mic className="w-5 h-5" />
+                                </div>
+                                <div className="overflow-hidden">
+                                  <p className="text-sm font-bold truncate">{selectedFile.name}</p>
+                                  <p className="text-[10px] text-muted-foreground">{(selectedFile.size / (1024 * 1024)).toFixed(2)} MB</p>
+                                </div>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="text-muted-foreground hover:text-red-400"
+                                onClick={() => setSelectedFile(null)}
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </Button>
+                            </div>
+                            
+                            <Button
+                              className="w-full h-12 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold shadow-lg shadow-emerald-500/20"
+                              onClick={async () => {
+                                if (selectedFile) {
+                                  setIsProcessing(true);
+                                  await sendAudioToBackend(selectedFile);
+                                  setSelectedFile(null);
+                                }
+                              }}
+                              disabled={isProcessing}
+                            >
+                              {isProcessing ? (
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              ) : null}
+                              {isProcessing ? "Processing..." : "Transcribe File"}
+                            </Button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </Card>
 
@@ -604,7 +681,7 @@ export default function DashboardPage() {
                       <option value="mr">Marathi</option>
                       <option value="ne">Nepali</option>
                       <option value="ur">Urdu</option>
-                      <option value="bn">Bengali</option>
+                      {/* <option value="bn">Bengali</option> */}
                       <option value="auto">Auto-detect Language</option>
                     </select>
                     <p className="text-[10px] text-muted-foreground italic">Note: Multi-language support uses the Whisper Medium model for high accuracy.</p>

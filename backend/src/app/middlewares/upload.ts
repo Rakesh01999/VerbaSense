@@ -13,8 +13,10 @@ const storage = multer.diskStorage({
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
     const ext = path.extname(file.originalname).toLowerCase();
-    if (ext !== '.wav' && ext !== '.mp3') {
-        return cb(new Error('Only .wav and .mp3 files are allowed'));
+    const allowedExtensions = ['.wav', '.mp3', '.m4a', '.ogg', '.flac', '.webm'];
+    
+    if (!allowedExtensions.includes(ext)) {
+        return cb(new Error(`Only audio files (${allowedExtensions.join(', ')}) are allowed`));
     }
     cb(null, true);
 };
