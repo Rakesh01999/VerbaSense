@@ -407,40 +407,28 @@ export default function DashboardPage() {
                     </div>
                     
                     {/* Quick Language Toggle */}
-                    <div className="mt-6 flex bg-muted/50 p-1 rounded-xl border border-white/5 relative z-20">
-                      <button
-                        type="button"
-                        onClick={() => setTranscriptionLanguage("en")}
-                        className={`px-4 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                          transcriptionLanguage === "en" 
-                          ? "bg-primary text-primary-foreground shadow-lg" 
-                          : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        English
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setTranscriptionLanguage("hi")}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                          transcriptionLanguage === "hi" 
-                          ? "bg-primary text-primary-foreground shadow-lg" 
-                          : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        Hindi
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setTranscriptionLanguage("bn")}
-                        className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                          transcriptionLanguage === "bn" 
-                          ? "bg-primary text-primary-foreground shadow-lg" 
-                          : "text-muted-foreground hover:text-foreground"
-                        }`}
-                      >
-                        Bengali
-                      </button>
+                    <div className="mt-6 flex flex-wrap justify-center bg-muted/50 p-1 rounded-xl border border-white/5 relative z-20 max-w-sm gap-1">
+                      {[
+                        { id: 'en', label: 'English' },
+                        { id: 'hi', label: 'Hindi' },
+                        { id: 'es', label: 'Spanish' },
+                        { id: 'ar', label: 'Arabic' },
+                        { id: 'mr', label: 'Marathi' },
+                        { id: 'auto', label: 'Auto' }
+                      ].map((lang) => (
+                        <button
+                          key={lang.id}
+                          type="button"
+                          onClick={() => setTranscriptionLanguage(lang.id)}
+                          className={`px-3 py-1.5 rounded-lg text-[10px] font-semibold transition-all ${
+                            transcriptionLanguage === lang.id 
+                            ? "bg-primary text-primary-foreground shadow-lg" 
+                            : "text-muted-foreground hover:text-foreground"
+                          }`}
+                        >
+                          {lang.label}
+                        </button>
+                      ))}
                     </div>
 
                     {isRecording && (
@@ -608,10 +596,18 @@ export default function DashboardPage() {
                     >
                       <option value="en">English (Global)</option>
                       <option value="hi">Hindi (India)</option>
+                      <option value="es">Spanish</option>
+                      <option value="fr">French</option>
+                      <option value="de">German</option>
+                      <option value="it">Italian</option>
+                      <option value="ar">Arabic</option>
+                      <option value="mr">Marathi</option>
+                      <option value="ne">Nepali</option>
+                      <option value="ur">Urdu</option>
                       <option value="bn">Bengali</option>
-                      <option value="auto">Auto-detect</option>
+                      <option value="auto">Auto-detect Language</option>
                     </select>
-                    <p className="text-[10px] text-muted-foreground italic">Note: Multilingual support enabled (Whisper Medium model).</p>
+                    <p className="text-[10px] text-muted-foreground italic">Note: Multi-language support uses the Whisper Medium model for high accuracy.</p>
                   </div>
                 </div>
               </Card>
