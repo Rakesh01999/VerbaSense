@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input"
 import { PasswordInput } from "@/components/ui/password-input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Mic, UserPlus, Loader2, CheckCircle2, Camera, X } from "lucide-react"
+import { UserPlus, Loader2, CheckCircle2, Camera, X } from "lucide-react"
+import Image from "next/image"
 import { apiRegister, apiGoogleLogin } from "@/lib/api"
 import { GoogleLogin } from "@react-oauth/google"
 import { useAuth } from "@/context/AuthContext"
@@ -105,8 +106,14 @@ export default function RegisterPage() {
       
       <div className="z-10 w-full max-w-md px-4 py-8">
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/20 mb-4 transition-transform hover:scale-105">
-            <Mic className="text-white w-8 h-8" />
+          <div className="relative w-16 h-16 mb-4 transition-transform hover:scale-105">
+            <Image 
+              src="/verbasense_logo.png" 
+              alt="VerbaSense Logo" 
+              fill
+              className="object-contain"
+              priority
+            />
           </div>
           <h1 className="text-4xl font-bold text-foreground tracking-tight">VerbaSense</h1>
           <p className="text-muted-foreground mt-2">Professional voice-to-text services.</p>
