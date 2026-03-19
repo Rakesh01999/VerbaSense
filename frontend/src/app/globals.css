@@ -94,3 +94,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer utilities {
+  .brand-text {
+    @apply bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent;
+  }
+}

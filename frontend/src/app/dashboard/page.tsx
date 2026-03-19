@@ -5,6 +5,7 @@ import { useAuth } from "@/context/AuthContext"
 import { useToast } from "@/context/ToastContext"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import Image from "next/image"
 import { Mic, Square, Loader2, LogOut, History, Settings, User, Copy, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ConfirmationModal } from "@/components/ui/confirmation-modal"
@@ -245,8 +246,13 @@ export default function DashboardPage() {
         </button>
 
         <div className={`flex items-center gap-3 mb-8 px-2 ${isSidebarCollapsed ? "justify-center" : ""}`}>
-          <div className="w-10 h-10 bg-gradient-to-br from-purple-600 to-blue-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-purple-500/20">
-            <Mic className="w-5 h-5 text-white" />
+          <div className="relative w-10 h-10 shrink-0">
+            <Image 
+              src="/verbasense_logo.png" 
+              alt="VerbaSense Logo" 
+              fill
+              className="object-contain"
+            />
           </div>
           {!isSidebarCollapsed && (
             <motion.div
@@ -346,10 +352,15 @@ export default function DashboardPage() {
       >
         <header className="flex justify-between items-center mb-8 md:hidden">
           <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-gradient-to-br from-purple-600 to-blue-600 rounded-lg flex items-center justify-center">
-              <Mic className="w-4 h-4 text-white" />
+            <div className="relative w-8 h-8">
+              <Image 
+                src="/verbasense_logo.png" 
+                alt="VerbaSense Logo" 
+                fill
+                className="object-contain"
+              />
             </div>
-            <span className="font-bold text-xl">VerbaSense</span>
+            <span className="font-bold text-xl brand-text">VerbaSense</span>
           </div>
           <Button variant="ghost" size="icon" onClick={handleLogout}>
             <LogOut className="w-5 h-5 text-muted-foreground" />

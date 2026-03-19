@@ -76,7 +76,7 @@ export default function LoginPage() {
               priority
             />
           </div>
-          <h1 className="text-4xl font-bold text-foreground tracking-tight">VerbaSense</h1>
+          <h1 className="text-4xl font-bold tracking-tight brand-text">VerbaSense</h1>
           <p className="text-muted-foreground mt-2">Precision voice-to-text services.</p>
         </div>
 

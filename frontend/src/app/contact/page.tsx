@@ -83,7 +83,7 @@ export default function ContactPage() {
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="lastName">Last Name</Label>
-                  <Input id="lastName" placeholder="Doe" className="bg-background/50" />
+                  <Input id="lastName" placeholder="Clark" className="bg-background/50" />
                 </div>
               </div>
               <div className="space-y-2">

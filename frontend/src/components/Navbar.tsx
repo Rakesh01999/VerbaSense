@@ -79,8 +79,8 @@ export default function Navbar() {
               priority
             />
           </div>
-          <span className="text-xl font-bold tracking-tight text-foreground">
-            Verba<span className="text-purple-500">Sense</span>
+          <span className="text-xl font-bold tracking-tight brand-text">
+            VerbaSense
           </span>
         </Link>
 
