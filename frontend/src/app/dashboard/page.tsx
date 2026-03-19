@@ -6,7 +6,7 @@ import { useToast } from "@/context/ToastContext"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
-import { Mic, Square, Loader2, LogOut, History, Settings, User, Copy, Trash2, ChevronLeft, ChevronRight } from "lucide-react"
+import { Mic, Square, Loader2, LogOut, History, Settings, User, Copy, Trash2, ChevronLeft, ChevronRight, Clock, AlertCircle } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ConfirmationModal } from "@/components/ui/confirmation-modal"
 
@@ -232,8 +232,8 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-background text-foreground flex pt-20 overflow-x-hidden">
       {/* Sidebar */}
       <aside 
-        className={`fixed left-0 top-20 bottom-0 z-40 border-r border-border flex flex-col p-4 bg-muted/30 backdrop-blur-xl hidden md:flex transition-all duration-300 shadow-[20px_0_50px_rgba(0,0,0,0.1)] ${
-          isSidebarCollapsed ? "w-20" : "w-64"
+        className={`fixed left-0 top-20 bottom-0 z-40 border-r border-border flex flex-col px-3 py-6 bg-card/40 backdrop-blur-2xl hidden md:flex transition-all duration-500 shadow-[0_0_50px_-12px_rgba(0,0,0,0.15)] ${
+          isSidebarCollapsed ? "w-22" : "w-72"
         }`}
       >
         {/* Floating Toggle Button */}
@@ -245,13 +245,14 @@ export default function DashboardPage() {
           {isSidebarCollapsed ? <ChevronRight className="w-3 h-3" /> : <ChevronLeft className="w-3 h-3" />}
         </button>
 
-        <div className={`flex items-center gap-3 mb-8 px-2 ${isSidebarCollapsed ? "justify-center" : ""}`}>
-          <div className="relative w-10 h-10 shrink-0">
+        <div className={`flex items-center gap-4 mb-10 px-3 ${isSidebarCollapsed ? "justify-center" : ""}`}>
+          <div className="relative w-12 h-12 shrink-0 group hover:scale-110 transition-transform duration-300">
+            <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
             <Image 
               src="/verbasense_logo.png" 
               alt="VerbaSense Logo" 
               fill
-              className="object-contain"
+              className="object-contain relative z-10"
             />
           </div>
           {!isSidebarCollapsed && (
@@ -260,9 +261,8 @@ export default function DashboardPage() {
               animate={{ opacity: 1, x: 0 }}
               className="flex flex-col"
             >
-              {/* <span className="font-bold text-lg tracking-tight leading-none">VerbaSense</span> */}
-              <span className="font-bold text-lg tracking-tight leading-none">Dashboard</span>
-              {/* <span className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">Transcription</span> */}
+              <span className="font-bold text-xl tracking-tight leading-none brand-text">VerbaSense</span>
+              <span className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1.5 font-bold">Studio Dashboard</span>
             </motion.div>
           )}
         </div>
@@ -276,24 +276,27 @@ export default function DashboardPage() {
             <Button 
               key={item.id}
               variant="ghost" 
-              className={`w-full group relative transition-all duration-200 ${
-                isSidebarCollapsed ? "justify-center px-0" : "justify-start px-3"
-              } ${activeTab === item.id ? "bg-primary/10 text-primary hover:bg-primary/20" : "text-muted-foreground hover:text-foreground hover:bg-accent/50"}`}
+              className={`w-full group relative h-14 transition-all duration-300 ${
+                isSidebarCollapsed ? "justify-center px-0" : "justify-start px-4"
+              } ${activeTab === item.id 
+                  ? "bg-primary/10 text-primary shadow-[0_0_20px_-5px_rgba(0,0,0,0.1)]" 
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
+                }`}
               title={isSidebarCollapsed ? item.label : ""}
               onClick={() => setActiveTab(item.id)}
             >
               {activeTab === item.id && !isSidebarCollapsed && (
                 <motion.div 
                   layoutId="active-pill"
-                  className="absolute left-0 w-1 h-6 bg-primary rounded-r-full" 
+                  className="absolute left-0 w-1.5 h-8 bg-primary rounded-r-full shadow-[2px_0_10px_rgba(var(--primary),0.5)]" 
                 />
               )}
-              <item.icon className={`${isSidebarCollapsed ? "" : "mr-3"} w-5 h-5 shrink-0 transition-transform group-hover:scale-110`} />
+              <item.icon className={`${isSidebarCollapsed ? "" : "mr-4"} w-6 h-6 shrink-0 transition-all duration-300 group-hover:scale-110 ${activeTab === item.id ? "text-primary" : "text-muted-foreground/70 group-hover:text-foreground"}`} />
               {!isSidebarCollapsed && (
                 <motion.span
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  className="font-medium"
+                  className={`font-semibold text-base ${activeTab === item.id ? "text-primary" : ""}`}
                 >
                   {item.label}
                 </motion.span>
@@ -303,9 +306,12 @@ export default function DashboardPage() {
         </nav>
 
         <div className="mt-auto pt-4 border-t border-border/50 space-y-4">
-          <div className={`flex items-center gap-3 px-2 py-2 rounded-xl transition-colors ${isSidebarCollapsed ? "justify-center" : "bg-accent/30"}`}>
-            <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-accent to-muted flex items-center justify-center shrink-0 border border-border">
-              <User className="w-5 h-5 text-muted-foreground" />
+          <div className={`flex items-center gap-4 px-3 py-3 rounded-2xl transition-all duration-300 border border-transparent shadow-sm ${isSidebarCollapsed ? "justify-center" : "bg-muted/40 border-border/50 backdrop-blur-md"}`}>
+            <div className="relative shrink-0">
+              <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-primary/10">
+                <User className="w-6 h-6 text-primary/80" />
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-green-500 border-2 border-background rounded-full shadow-sm" />
             </div>
             {!isSidebarCollapsed && (
               <motion.div 
@@ -313,29 +319,26 @@ export default function DashboardPage() {
                 animate={{ opacity: 1 }}
                 className="flex flex-col min-w-0"
               >
-                <span className="text-sm font-bold truncate text-foreground">{user?.email?.split('@')[0]}</span>
-                <div className="flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-green-500" />
-                  <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">Free Plan</span>
-                </div>
+                <span className="text-sm font-bold truncate text-foreground leading-tight">{user?.email?.split('@')[0]}</span>
+                <span className="text-[10px] text-primary font-bold uppercase tracking-widest mt-0.5">Free Explorer</span>
               </motion.div>
             )}
           </div>
           
           <Button 
             variant="ghost" 
-            className={`w-full hover:text-red-300 hover:bg-red-500/10 text-red-400/80 transition-all ${
-              isSidebarCollapsed ? "justify-center px-0" : "justify-start px-3"
+            className={`w-full h-12 hover:text-red-500 hover:bg-red-500/10 text-muted-foreground/80 transition-all rounded-xl ${
+              isSidebarCollapsed ? "justify-center px-0" : "justify-start px-4"
             }`}
             onClick={handleLogout}
             title={isSidebarCollapsed ? "Logout" : ""}
           >
-            <LogOut className={`${isSidebarCollapsed ? "" : "mr-3"} w-5 h-5 shrink-0 transition-transform group-hover:-translate-x-1`} />
+            <LogOut className={`${isSidebarCollapsed ? "" : "mr-4"} w-5 h-5 shrink-0 transition-transform group-hover:-translate-x-1`} />
             {!isSidebarCollapsed && (
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="font-medium"
+                className="font-semibold text-sm"
               >
                 Logout
               </motion.span>
@@ -346,13 +349,13 @@ export default function DashboardPage() {
 
       {/* Main Content */}
       <main 
-        className={`flex-1 flex flex-col p-6 overflow-y-auto transition-all duration-300 ${
-          isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
+        className={`flex-1 flex flex-col p-8 md:p-12 overflow-y-auto transition-all duration-500 bg-gradient-to-br from-background via-background to-primary/5 ${
+          isSidebarCollapsed ? "md:ml-22" : "md:ml-72"
         }`}
       >
-        <header className="flex justify-between items-center mb-8 md:hidden">
-          <div className="flex items-center gap-2">
-            <div className="relative w-8 h-8">
+        <header className="flex justify-between items-center mb-10 md:hidden bg-card/50 backdrop-blur-md p-4 rounded-2xl border border-border/50">
+          <div className="flex items-center gap-3">
+            <div className="relative w-9 h-9">
               <Image 
                 src="/verbasense_logo.png" 
                 alt="VerbaSense Logo" 
@@ -362,22 +365,28 @@ export default function DashboardPage() {
             </div>
             <span className="font-bold text-xl brand-text">VerbaSense</span>
           </div>
-          <Button variant="ghost" size="icon" onClick={handleLogout}>
-            <LogOut className="w-5 h-5 text-muted-foreground" />
+          <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-full hover:bg-red-500/10 hover:text-red-500">
+            <LogOut className="w-5 h-5" />
           </Button>
         </header>
 
         <section className="max-w-4xl mx-auto w-full flex-1 flex flex-col">
           {activeTab === "recorder" ? (
             <>
-              <div className="mb-8 text-center md:text-left">
-                <h2 className="text-3xl font-bold mb-2">Speech-to-Text</h2>
-                <p className="text-muted-foreground">Record your voice and let VerbaSense handle the rest.</p>
+              <div className="mb-12 text-center md:text-left space-y-2">
+                <motion.h2 
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="text-4xl md:text-5xl font-black tracking-tight"
+                >
+                  Beyond <span className="brand-text">Speech.</span>
+                </motion.h2>
+                <p className="text-muted-foreground text-lg max-w-2xl">Precision voice-to-text intelligence. Powered by Open-Source models.</p>
               </div>
 
-              <div className="grid grid-cols-1 gap-6 flex-1">
+              <div className="grid grid-cols-1 gap-10 flex-1">
                 {/* Recording Area */}
-                <Card className="border-border bg-card/50 backdrop-blur-xl flex flex-col items-center justify-center p-12 text-center relative overflow-hidden min-h-[400px]">
+                <Card className="border-border/50 bg-card/30 backdrop-blur-3xl flex flex-col items-center justify-center p-16 text-center relative overflow-hidden min-h-[450px] shadow-2xl shadow-primary/5 rounded-[2.5rem] border-2">
                   {/* Background gradient pulses when recording */}
                   <AnimatePresence>
                     {isRecording && (
@@ -535,21 +544,21 @@ export default function DashboardPage() {
                 </Card>
 
                 {/* Result Area */}
-                <Card className="border-border bg-card/50 backdrop-blur-xl flex flex-col">
-                  <CardHeader className="flex flex-row items-center justify-between border-b border-white/5">
+                <Card className="border-border/50 bg-card/40 backdrop-blur-2xl flex flex-col shadow-xl rounded-[2rem] overflow-hidden">
+                  <CardHeader className="flex flex-row items-center justify-between border-b border-border/50 py-5 px-8">
                     <div>
-                      <CardTitle className="text-sm uppercase tracking-wider text-muted-foreground font-bold">Transcription Result</CardTitle>
+                      <CardTitle className="text-xs uppercase tracking-[0.2em] text-primary font-black">Live Output</CardTitle>
                     </div>
                     <div className="flex gap-2">
-                      <Button variant="ghost" size="icon" onClick={() => copyToClipboard(transcription)} title="Copy result">
+                      <Button variant="ghost" size="icon" onClick={() => copyToClipboard(transcription)} title="Copy result" className="rounded-full hover:bg-primary/10">
                         <Copy className="w-4 h-4 text-muted-foreground" />
                       </Button>
-                      <Button variant="ghost" size="icon" onClick={clearTranscription} title="Clear">
-                        <Trash2 className="w-4 h-4 text-red-400 text-muted-foreground" />
+                      <Button variant="ghost" size="icon" onClick={clearTranscription} title="Clear" className="rounded-full hover:bg-red-500/10">
+                        <Trash2 className="w-4 h-4 text-red-400" />
                       </Button>
                     </div>
                   </CardHeader>
-                  <CardContent className="p-6 flex-1 min-h-[200px]">
+                  <CardContent className="p-8 flex-1 min-h-[250px]">
                     {transcription ? (
                       <motion.p 
                         initial={{ opacity: 0, y: 10 }}
@@ -569,9 +578,15 @@ export default function DashboardPage() {
             </>
           ) : activeTab === "history" ? (
             <>
-              <div className="mb-8 text-center md:text-left">
-                <h2 className="text-3xl font-bold mb-2">Transcription History</h2>
-                <p className="text-muted-foreground">Manage your previous voice recordings and texts.</p>
+              <div className="mb-12 text-center md:text-left space-y-2">
+                <motion.h2 
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  className="text-4xl md:text-5xl font-black tracking-tight"
+                >
+                  Your <span className="brand-text">Archives.</span>
+                </motion.h2>
+                <p className="text-muted-foreground text-lg">Manage and review your previous voice intelligence sessions.</p>
               </div>
 
               <div className="space-y-4">
@@ -587,23 +602,24 @@ export default function DashboardPage() {
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.05 }}
                     >
-                      <Card className="border-border bg-card/40 hover:bg-card/60 backdrop-blur-sm transition-colors overflow-hidden">
+                      <Card className="border-border/50 bg-card/30 hover:bg-card/50 backdrop-blur-xl transition-all duration-300 overflow-hidden group rounded-2xl border-2 hover:border-primary/30 shadow-lg hover:shadow-primary/5">
                         <div className="p-4 sm:p-6 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
                           <div className="grow min-w-0 w-full">
                             <div className="flex items-center gap-2 mb-2">
-                              <span className="text-xs font-medium text-primary bg-primary/10 px-2 py-0.5 rounded-full">
-                                {new Date(item.createdAt).toLocaleDateString(undefined, {
-                                  month: 'short',
-                                  day: 'numeric',
-                                  year: 'numeric'
-                                })}
-                              </span>
-                              <span className="text-[10px] text-muted-foreground">
-                                {new Date(item.createdAt).toLocaleTimeString(undefined, {
-                                  hour: '2-digit',
-                                  minute: '2-digit'
-                                })}
-                              </span>
+                                <span className="text-[10px] font-black tracking-[0.1em] text-primary uppercase bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                                  {new Date(item.createdAt).toLocaleDateString(undefined, {
+                                    month: 'short',
+                                    day: 'numeric',
+                                    year: 'numeric'
+                                  })}
+                                </span>
+                                <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">
+                                  <Clock className="w-3 h-3" />
+                                  {new Date(item.createdAt).toLocaleTimeString(undefined, {
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                  })}
+                                </span>
                             </div>
                             <p className="text-sm text-foreground line-clamp-2 leading-relaxed">
                               {item.transcribedText}
@@ -641,13 +657,19 @@ export default function DashboardPage() {
             </>
           ) : (
             <div className="space-y-8 pb-10">
-              <div className="mb-8 text-center md:text-left">
-                <h2 className="text-3xl font-bold mb-2">Settings</h2>
-                <p className="text-muted-foreground">Manage your account and transcription preferences.</p>
+              <div className="mb-12 text-center md:text-left space-y-2">
+                <motion.h2 
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="text-4xl md:text-5xl font-black tracking-tight"
+                >
+                  Studio <span className="brand-text">Preferences.</span>
+                </motion.h2>
+                <p className="text-muted-foreground text-lg">Configure your workspace and account identity.</p>
               </div>
 
               {/* Profile Section */}
-              <Card className="border-border bg-card/40 backdrop-blur-sm p-6">
+              <Card className="border-border/50 bg-card/30 backdrop-blur-3xl p-8 rounded-3xl shadow-xl">
                 <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
                   <User className="w-5 h-5 text-primary" /> Profile Information
                 </h3>
@@ -701,18 +723,18 @@ export default function DashboardPage() {
               </Card>
 
               {/* Danger Zone */}
-              <Card className="border-red-500/20 bg-red-500/5 backdrop-blur-sm p-6">
-                <h3 className="text-lg font-semibold mb-6 text-red-400 flex items-center gap-2">
-                  <Trash2 className="w-5 h-5" /> Danger Zone
+              <Card className="border-red-500/20 bg-red-500/5 backdrop-blur-3xl p-8 rounded-3xl border-2 shadow-2xl shadow-red-500/5">
+                <h3 className="text-xl font-bold mb-6 text-red-500 flex items-center gap-3">
+                  <AlertCircle className="w-6 h-6" /> Danger Zone
                 </h3>
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                  <div>
-                    <p className="font-medium text-red-200">Clear Transcription History</p>
-                    <p className="text-xs text-red-400/60 max-w-sm">This will permanently delete all your previous recordings and transcriptions. This action cannot be reversed.</p>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+                  <div className="space-y-1">
+                    <p className="text-lg font-bold text-red-200">Wipe All Archives</p>
+                    <p className="text-sm text-red-400/60 max-w-sm leading-relaxed">This will permanently delete all your previous recordings and transcriptions. This action is irreversible.</p>
                   </div>
                   <Button 
                     variant="ghost" 
-                    className="bg-red-500/10 hover:bg-red-500/20 text-red-400 border border-red-500/20"
+                    className="bg-red-500/10 hover:bg-red-500/20 text-red-500 border border-red-500/40 rounded-2xl h-12 px-6 font-bold"
                     onClick={clearAllHistory}
                   >
                     Delete Everything
