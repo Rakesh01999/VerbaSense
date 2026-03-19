@@ -21,10 +21,6 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "VerbaSense | Precision Voice-to-Text",
   description: "Professional speech recognition and high-accuracy transcription services.",
-  icons: {
-    icon: "/verbasense_logo.png",
-    apple: "/verbasense_logo.png",
-  },
 };
 
 export default function RootLayout({
