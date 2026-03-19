@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from "react"
+import Link from "next/link"
 import { useAuth } from "@/context/AuthContext"
 import { useToast } from "@/context/ToastContext"
 import { Button } from "@/components/ui/button"
@@ -229,10 +230,10 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background text-foreground flex pt-20 overflow-x-hidden">
+    <div className="min-h-screen bg-background text-foreground flex pt-16 overflow-x-hidden">
       {/* Sidebar */}
       <aside 
-        className={`fixed left-0 top-20 bottom-0 z-40 border-r border-border flex flex-col px-3 py-6 bg-card/40 backdrop-blur-2xl hidden md:flex transition-all duration-500 shadow-[0_0_50px_-12px_rgba(0,0,0,0.15)] ${
+        className={`fixed left-0 top-16 bottom-0 z-40 border-r border-border flex flex-col px-3 py-6 bg-card/40 backdrop-blur-2xl hidden md:flex transition-all duration-500 shadow-[0_0_50px_-12px_rgba(0,0,0,0.15)] ${
           isSidebarCollapsed ? "w-22" : "w-72"
         }`}
       >
@@ -246,23 +247,14 @@ export default function DashboardPage() {
         </button>
 
         <div className={`flex items-center gap-4 mb-10 px-3 ${isSidebarCollapsed ? "justify-center" : ""}`}>
-          <div className="relative w-12 h-12 shrink-0 group hover:scale-110 transition-transform duration-300">
-            <div className="absolute inset-0 bg-primary/20 rounded-2xl blur-xl group-hover:blur-2xl transition-all" />
-            <Image 
-              src="/verbasense_logo.png" 
-              alt="VerbaSense Logo" 
-              fill
-              className="object-contain relative z-10"
-            />
-          </div>
           {!isSidebarCollapsed && (
             <motion.div
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               className="flex flex-col"
             >
-              <span className="font-bold text-xl tracking-tight leading-none brand-text">VerbaSense</span>
-              <span className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1.5 font-bold">Studio Dashboard</span>
+              <span className="font-bold text-xl tracking-tight leading-none text-foreground/90 uppercase">Studio Workspace</span>
+              <span className="text-[10px] text-primary uppercase tracking-[0.2em] mt-2 font-black">Management Hub</span>
             </motion.div>
           )}
         </div>
@@ -306,8 +298,11 @@ export default function DashboardPage() {
         </nav>
 
         <div className="mt-auto pt-4 border-t border-border/50 space-y-4">
-          <div className={`flex items-center gap-4 px-3 py-3 rounded-2xl transition-all duration-300 border border-transparent shadow-sm ${isSidebarCollapsed ? "justify-center" : "bg-muted/40 border-border/50 backdrop-blur-md"}`}>
-            <div className="relative shrink-0">
+          <Link 
+            href="/profile"
+            className={`flex items-center gap-4 px-3 py-3 rounded-2xl transition-all duration-300 border border-transparent shadow-sm hover:border-primary/20 hover:bg-muted/60 group ${isSidebarCollapsed ? "justify-center" : "bg-muted/40 border-border/50 backdrop-blur-md"}`}
+          >
+            <div className="relative shrink-0 transition-transform group-hover:scale-105">
               <div className="w-12 h-12 rounded-full bg-gradient-to-tr from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-primary/10">
                 <User className="w-6 h-6 text-primary/80" />
               </div>
@@ -319,28 +314,31 @@ export default function DashboardPage() {
                 animate={{ opacity: 1 }}
                 className="flex flex-col min-w-0"
               >
-                <span className="text-sm font-bold truncate text-foreground leading-tight">{user?.email?.split('@')[0]}</span>
-                <span className="text-[10px] text-primary font-bold uppercase tracking-widest mt-0.5">Free Explorer</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-sm font-bold truncate text-foreground leading-tight">{user?.email?.split('@')[0]}</span>
+                  <ChevronRight className="w-3 h-3 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                </div>
+                <span className="text-[10px] text-primary font-bold uppercase tracking-widest mt-0.5">View Profile</span>
               </motion.div>
             )}
-          </div>
+          </Link>
           
           <Button 
             variant="ghost" 
-            className={`w-full h-12 hover:text-red-500 hover:bg-red-500/10 text-muted-foreground/80 transition-all rounded-xl ${
-              isSidebarCollapsed ? "justify-center px-0" : "justify-start px-4"
+            className={`w-full h-14 hover:bg-red-500/10 text-red-500 transition-all rounded-2xl border border-transparent hover:border-red-500/20 group ${
+              isSidebarCollapsed ? "justify-center px-0" : "justify-start px-5 gap-4"
             }`}
             onClick={handleLogout}
             title={isSidebarCollapsed ? "Logout" : ""}
           >
-            <LogOut className={`${isSidebarCollapsed ? "" : "mr-4"} w-5 h-5 shrink-0 transition-transform group-hover:-translate-x-1`} />
+            <LogOut className={`w-5 h-5 shrink-0 transition-transform group-hover:-translate-x-1`} />
             {!isSidebarCollapsed && (
               <motion.span
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="font-semibold text-sm"
+                className="font-bold text-sm tracking-wide"
               >
-                Logout
+                Sign Out
               </motion.span>
             )}
           </Button>

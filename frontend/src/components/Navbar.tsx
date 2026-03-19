@@ -61,10 +61,10 @@ export default function Navbar() {
 
   return (
     <nav
-      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
-        isScrolled 
-          ? "py-3 bg-background/80 backdrop-blur-xl border-b border-border shadow-lg" 
-          : "py-5 bg-transparent"
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 flex items-center ${
+        isScrolled || isDashboard 
+          ? "h-16 bg-background/80 backdrop-blur-xl border-b border-border shadow-lg" 
+          : "h-20 bg-transparent"
       }`}
     >
       <div className="container mx-auto px-6 flex items-center justify-between">
