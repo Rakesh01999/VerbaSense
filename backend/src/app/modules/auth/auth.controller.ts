@@ -69,7 +69,7 @@ export const login = catchAsync(async (req: Request, res: Response) => {
     const payload = { user: { id: user.id } };
     const secret = process.env.JWT_SECRET || 'secret';
 
-    jwt.sign(payload, secret, { expiresIn: 3600 }, (err, token) => {
+    jwt.sign(payload, secret, { expiresIn: '24h' }, (err, token) => {
         if (err) throw err;
 
         sendResponse(res, {
@@ -251,7 +251,7 @@ export const googleLogin = catchAsync(async (req: Request, res: Response) => {
     const jwtPayload = { user: { id: user.id } };
     const secret = process.env.JWT_SECRET || 'secret';
 
-    jwt.sign(jwtPayload, secret, { expiresIn: '1h' }, (err, token) => {
+    jwt.sign(jwtPayload, secret, { expiresIn: '24h' }, (err, token) => {
         if (err) throw err;
 
         sendResponse(res, {
