@@ -207,19 +207,53 @@ export default function ContactPage() {
               </div>
             </div>
 
-            {/* Verification Info */}
-            <div className="p-6 rounded-2xl bg-secondary/20 border border-border/50">
-              <div className="flex gap-4 items-start">
-                <ShieldCheck className="w-6 h-6 text-purple-500 shrink-0" />
-                <div>
-                  <h4 className="font-bold text-sm mb-1 text-purple-400 uppercase tracking-wider">Secure Communication</h4>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    To keep our support high-quality, we verify guest identities before the message area is unlocked. 
-                    Verified users enjoy priority support.
-                  </p>
+            {/* Verification Info / Guest Guide */}
+            {!isAuthenticated ? (
+                <div className="space-y-6">
+                    <div className="p-6 rounded-2xl bg-secondary/20 border border-border/50">
+                        <div className="flex gap-4 items-start">
+                            <ShieldCheck className="w-6 h-6 text-purple-500 shrink-0" />
+                            <div>
+                                <h4 className="font-bold text-sm mb-1 text-purple-400 uppercase tracking-wider">Guest Verification</h4>
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                    To maintain high support quality and prevent spam, we use a secure verification process for guest inquiries.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="space-y-4 px-2">
+                        <h4 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4">How to send a message</h4>
+                        {[
+                            { step: 1, title: "Identity Details", desc: "Provide your name and professional email address." },
+                            { step: 2, title: "Quick Verification", desc: "Enter the 6-digit code sent to your inbox to unlock the message area." },
+                            { step: 3, title: "Direct Support", desc: "Write your inquiry and send it directly to our team." }
+                        ].map((item) => (
+                            <div key={item.step} className="flex gap-4">
+                                <div className="w-6 h-6 rounded-full bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-[10px] font-bold text-purple-400 shrink-0">
+                                    {item.step}
+                                </div>
+                                <div>
+                                    <p className="text-xs font-bold">{item.title}</p>
+                                    <p className="text-[11px] text-muted-foreground">{item.desc}</p>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
-              </div>
-            </div>
+            ) : (
+                <div className="p-6 rounded-2xl bg-secondary/20 border border-border/50">
+                    <div className="flex gap-4 items-start">
+                        <ShieldCheck className="w-6 h-6 text-purple-500 shrink-0" />
+                        <div>
+                            <h4 className="font-bold text-sm mb-1 text-purple-400 uppercase tracking-wider">Priority Support</h4>
+                                <p className="text-xs text-muted-foreground leading-relaxed">
+                                    You are currently logged in. Your message will be handled with priority by our support team.
+                                </p>
+                        </div>
+                    </div>
+                </div>
+            )}
           </motion.div>
 
           {/* Form Side */}
@@ -294,16 +328,16 @@ export default function ContactPage() {
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
                           <Label htmlFor="firstName">First Name</Label>
-                          <Input id="firstName" placeholder="Jane" required value={formData.firstName} onChange={handleChange} className="bg-background/40" />
+                          <Input id="firstName" placeholder="Yane" required value={formData.firstName} onChange={handleChange} className="bg-background/40" />
                         </div>
                         <div className="space-y-2">
                           <Label htmlFor="lastName">Last Name</Label>
-                          <Input id="lastName" placeholder="Doe" required value={formData.lastName} onChange={handleChange} className="bg-background/40" />
+                          <Input id="lastName" placeholder="Clark" required value={formData.lastName} onChange={handleChange} className="bg-background/40" />
                         </div>
                       </div>
                       <div className="space-y-2">
                         <Label htmlFor="email">Email Address</Label>
-                        <Input id="email" type="email" placeholder="jane@company.com" required value={formData.email} onChange={handleChange} className="bg-background/40" />
+                        <Input id="email" type="email" placeholder="Yane@company.com" required value={formData.email} onChange={handleChange} className="bg-background/40" />
                       </div>
                       
                       {status === 'error' && (

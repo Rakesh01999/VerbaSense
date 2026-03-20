@@ -1,6 +1,7 @@
 "use client"
 
 import React from "react"
+import { useRouter } from "next/navigation"
 import PageHero from "@/components/PageHero"
 import BackgroundEffects from "@/components/BackgroundEffects"
 import { motion } from "framer-motion"
@@ -17,6 +18,7 @@ export default function PricingPage() {
       features: ["60 minutes / month", "Standard Accuracy", "Web App Access", "Community Support"],
       cta: "Start for Free",
       highlighted: false,
+      href: "/dashboard",
     },
     {
       name: "Pro",
@@ -25,6 +27,7 @@ export default function PricingPage() {
       features: ["1,000 minutes / month", "High Fidelity Engine", "Priority Processing", "Email Support", "API Access"],
       cta: "Get Started",
       highlighted: true,
+      href: "/register",
     },
     {
       name: "Enterprise",
@@ -33,9 +36,11 @@ export default function PricingPage() {
       features: ["Unlimited Minutes", "Custom Neural Models", "Dedicated Account Manager", "SSO & Advanced Security", "SLA Guarantees"],
       cta: "Contact Sales",
       highlighted: false,
+      href: "/contact",
     },
   ]
 
+  const router = useRouter()
   return (
     <main className="min-h-screen bg-background text-foreground">
       <BackgroundEffects />
@@ -82,6 +87,7 @@ export default function PricingPage() {
                 </CardContent>
                 <CardFooter className="p-8">
                   <Button 
+                    onClick={() => router.push(plan.href)}
                     className={`w-full py-6 rounded-xl font-bold transition-all ${plan.highlighted ? "bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-500 hover:to-blue-500 shadow-lg shadow-purple-500/20" : "variant-outline"}`}
                   >
                     {plan.cta}
