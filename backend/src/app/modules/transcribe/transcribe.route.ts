@@ -14,6 +14,9 @@ router.get('/history', auth, transcribeController.getHistory);
 // @route   DELETE api/transcribe/:id - Delete a transcription
 router.delete('/:id', auth, transcribeController.deleteTranscription);
 
+// @route   PATCH api/transcribe/:id - Update a transcription
+router.patch('/:id', auth, transcribeController.updateTranscription);
+
 // @route   DELETE api/transcribe - Clear all history
 router.delete('/', auth, transcribeController.clearAllHistory);
 

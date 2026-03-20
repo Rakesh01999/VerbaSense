@@ -12,7 +12,7 @@ export const uploadAndTranscribe = catchAsync(async (req: AuthRequest, res: Resp
 
     const audioPath = req.file.path;
     const language = req.body.language || 'en';
-    const transcribedText = await transcribeAudio(audioPath, language);
+    const { text: transcribedText, duration } = await transcribeAudio(audioPath, language);
 
     const newTranscription = new Transcription({
         user: (req.user as any)?.id || req.user,
@@ -21,7 +21,8 @@ export const uploadAndTranscribe = catchAsync(async (req: AuthRequest, res: Resp
         language,
         metadata: {
             size: req.file.size,
-            format: req.file.mimetype
+            format: req.file.mimetype,
+            duration: duration
         }
     });
 
@@ -75,11 +76,35 @@ export const clearAllHistory = catchAsync(async (req: AuthRequest, res: Response
     const result = await Transcription.deleteMany({
         user: (req.user as any)?.id || req.user
     });
-
     sendResponse(res, {
         statusCode: 200,
         success: true,
         message: `Deleted ${result.deletedCount} transcriptions`,
         data: result
+    });
+});
+
+export const updateTranscription = catchAsync(async (req: AuthRequest, res: Response) => {
+    const { id } = req.params;
+    const { transcribedText } = req.body;
+    
+    const transcription = await Transcription.findOneAndUpdate(
+        { _id: id, user: (req.user as any)?.id || req.user },
+        { transcribedText },
+        { new: true }
+    );
+
+    if (!transcription) {
+        return res.status(404).json({
+            success: false,
+            message: 'Transcription not found or unauthorized'
+        });
+    }
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Transcription updated successfully',
+        data: transcription
     });
 });

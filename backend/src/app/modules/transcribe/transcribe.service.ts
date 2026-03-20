@@ -47,13 +47,32 @@ const convertToWhisperFormat = (inputPath: string): Promise<string> => {
     });
 };
 
-export const transcribeAudio = async (audioPath: string, language: string = 'en'): Promise<string> => {
+/**
+ * Gets the duration of an audio file in seconds
+ */
+const getAudioDuration = (inputPath: string): Promise<number> => {
+    return new Promise((resolve) => {
+        ffmpeg.ffprobe(inputPath, (err, metadata) => {
+            if (err) {
+                console.error(`[FFprobe] Error getting duration: ${err.message}`);
+                return resolve(0);
+            }
+            resolve(metadata.format.duration || 0);
+        });
+    });
+};
+
+export const transcribeAudio = async (audioPath: string, language: string = 'en'): Promise<{ text: string, duration: number }> => {
     let convertedPath: string | null = null;
+    let duration = 0;
     
     try {
+        // Get duration first
+        duration = await getAudioDuration(audioPath);
+
         if (!fs.existsSync(WHISPER_PATH)) {
             console.warn(`[Whisper] Binary not found at ${WHISPER_PATH}`);
-            return "Error: Whisper binary not found. Please ensure all DLLs are extracted and main.exe is in backend/bin.";
+            return { text: "Error: Whisper binary not found.", duration };
         }
 
         // Use multilingual model for Bengali or any other non-English language
@@ -62,7 +81,7 @@ export const transcribeAudio = async (audioPath: string, language: string = 'en'
         if (!fs.existsSync(modelPath)) {
             console.warn(`[Whisper] Model not found at ${modelPath}`);
             const modelName = path.basename(modelPath);
-            return `Error: Whisper model not found. Please place ${modelName} in backend/bin.`;
+            return { text: `Error: Whisper model not found. Please place ${modelName} in backend/bin.`, duration };
         }
 
         // 1. Convert to required format
@@ -104,7 +123,7 @@ export const transcribeAudio = async (audioPath: string, language: string = 'en'
         });
 
         console.log(`[Whisper] Transcription successful`);
-        return transcribedText;
+        return { text: transcribedText, duration };
 
     } catch (err: any) {
         console.error(`[Transcribe Service] Error: ${err.message}`);

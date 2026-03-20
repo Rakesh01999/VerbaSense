@@ -15,9 +15,11 @@ interface TranscriptionItem {
   _id: string;
   transcribedText: string;
   createdAt: string;
+  audioUrl?: string;
   metadata?: {
     size: number;
     format: string;
+    duration?: number;
   };
 }
 
@@ -34,6 +36,11 @@ export default function DashboardPage() {
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
+  
+  const [searchTerm, setSearchTerm] = useState("")
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingText, setEditingText] = useState("")
+  const [isUpdating, setIsUpdating] = useState(false)
   
   const [modalConfig, setModalConfig] = useState<{
     isOpen: boolean;
@@ -221,9 +228,66 @@ export default function DashboardPage() {
     showToast("Transcription cleared.", "info")
   }
 
+  const handleUpdateTranscription = async (id: string) => {
+    if (!editingText.trim()) return
+    setIsUpdating(true)
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transcribe/${id}`, {
+        method: 'PATCH',
+        headers: { 
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ transcribedText: editingText })
+      })
+      const result = await response.json()
+      if (result.success) {
+        setHistory(prev => prev.map(item => item._id === id ? { ...item, transcribedText: editingText } : item))
+        setEditingId(null)
+        showToast("Transcription updated.", "success")
+      }
+    } catch (err) {
+      console.error("Error updating transcription:", err)
+      showToast("Failed to update.", "error")
+    } finally {
+      setIsUpdating(false)
+    }
+  }
+
+  const filteredHistory = history.filter(item => 
+    item.transcribedText.toLowerCase().includes(searchTerm.toLowerCase())
+  )
+
   const handleLogout = () => {
     logout()
     showToast("Signed out successfully. See you soon!", "info")
+  }
+
+  const formatDuration = (seconds?: number) => {
+    if (!seconds) return "0:00"
+    const mins = Math.floor(seconds / 60)
+    const secs = Math.floor(seconds % 60)
+    return `${mins}:${secs.toString().padStart(2, '0')}`
+  }
+
+  const exportAsTxt = (text: string, date: string) => {
+    const blob = new Blob([text], { type: 'text/plain' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `transcription-${new Date(date).toISOString().split('T')[0]}.txt`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+    showToast("Downloaded as .txt", "success")
+  }
+
+  const getFullAudioUrl = (path: string) => {
+    const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
+    const baseUrl = apiBase.replace("/api", "")
+    return `${baseUrl}/${path}`
   }
 
   return (
@@ -382,7 +446,6 @@ export default function DashboardPage() {
               <div className="grid grid-cols-1 gap-10 flex-1">
                 {/* Recording Area */}
                 <Card className="border-border/50 bg-card/30 backdrop-blur-3xl flex flex-col items-center justify-center p-16 text-center relative overflow-hidden min-h-[450px] shadow-2xl shadow-primary/5 rounded-[2.5rem] border-2">
-                  {/* Background gradient pulses when recording */}
                   <AnimatePresence>
                     {isRecording && (
                       <motion.div 
@@ -584,13 +647,25 @@ export default function DashboardPage() {
                 <p className="text-muted-foreground text-lg">Manage and review your previous voice intelligence sessions.</p>
               </div>
 
+              {/* Search Bar */}
+              <div className="mb-6 relative">
+                <input
+                  type="text"
+                  placeholder="Search transcriptions..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  className="w-full bg-card/30 backdrop-blur-3xl border border-border/50 rounded-2xl p-4 pl-12 focus:ring-2 focus:ring-primary/50 outline-none transition-all shadow-lg"
+                />
+                <History className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+              </div>
+
               <div className="space-y-4">
                 {isLoadingHistory ? (
                   <div className="flex items-center justify-center p-20">
                     <Loader2 className="w-10 h-10 text-primary animate-spin" />
                   </div>
                 ) : history.length > 0 ? (
-                  history.map((item, index) => (
+                  (searchTerm ? filteredHistory : history).map((item, index) => (
                     <motion.div
                       key={item._id}
                       initial={{ opacity: 0, y: 20 }}
@@ -610,30 +685,101 @@ export default function DashboardPage() {
                                 </span>
                                 <span className="text-[10px] font-bold text-muted-foreground flex items-center gap-1">
                                   <Clock className="w-3 h-3" />
-                                  {new Date(item.createdAt).toLocaleTimeString(undefined, {
+                                   {new Date(item.createdAt).toLocaleTimeString(undefined, {
                                     hour: '2-digit',
                                     minute: '2-digit'
                                   })}
                                 </span>
+                                {item.metadata?.duration && (
+                                  <span className="text-[10px] font-bold text-primary/60 flex items-center gap-1">
+                                    <Clock className="w-3 h-3" />
+                                    {formatDuration(item.metadata.duration)}
+                                  </span>
+                                )}
                             </div>
-                            <p className="text-sm text-foreground line-clamp-2 leading-relaxed">
-                              {item.transcribedText}
-                            </p>
+                            
+                            {editingId === item._id ? (
+                              <div className="space-y-3 w-full">
+                                <textarea
+                                  value={editingText}
+                                  onChange={(e) => setEditingText(e.target.value)}
+                                  className="w-full bg-muted/30 border border-primary/30 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary/50 outline-none min-h-[100px]"
+                                  autoFocus
+                                />
+                                <div className="flex gap-2">
+                                  <Button 
+                                    size="sm" 
+                                    disabled={isUpdating}
+                                    onClick={() => handleUpdateTranscription(item._id)}
+                                    className="bg-primary text-primary-foreground font-bold rounded-lg"
+                                  >
+                                    {isUpdating && <Loader2 className="w-3 h-3 mr-2 animate-spin" />}
+                                    Save
+                                  </Button>
+                                  <Button 
+                                    size="sm" 
+                                    variant="ghost" 
+                                    onClick={() => setEditingId(null)}
+                                    className="text-muted-foreground hover:bg-muted font-bold rounded-lg"
+                                  >
+                                    Cancel
+                                  </Button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-sm text-foreground line-clamp-2 leading-relaxed mb-4">
+                                {item.transcribedText}
+                              </p>
+                            )}
+                            
+                            {item.audioUrl && (
+                              <div className="flex items-center gap-3 bg-muted/30 p-2 rounded-xl border border-white/5 max-w-xs transition-colors hover:bg-muted/50">
+                                <audio 
+                                  src={getFullAudioUrl(item.audioUrl)} 
+                                  controls 
+                                  className="h-8 w-full scale-90 -ml-4 opacity-70 hover:opacity-100 transition-opacity" 
+                                />
+                              </div>
+                            )}
                           </div>
+                          
                           <div className="flex items-center gap-2 shrink-0 w-full sm:w-auto justify-end sm:justify-start">
+                             <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-9 w-9 p-0 hover:bg-primary/10 text-primary" 
+                              onClick={() => {
+                                setEditingId(item._id)
+                                setEditingText(item.transcribedText)
+                              }}
+                              title="Edit"
+                            >
+                              <Settings className="h-4 w-4" />
+                            </Button>
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              className="h-8 w-8 p-0" 
+                              className="h-9 w-9 p-0 hover:bg-primary/10 text-primary" 
                               onClick={() => copyToClipboard(item.transcribedText)}
+                              title="Copy Text"
                             >
                               <Copy className="h-4 w-4" />
                             </Button>
                             <Button 
                               variant="ghost" 
                               size="sm" 
-                              className="h-8 w-8 p-0 text-red-400 hover:text-red-500 hover:bg-red-500/10"
+                              className="h-9 w-9 p-0 hover:bg-emerald-500/10 text-emerald-500" 
+                              onClick={() => exportAsTxt(item.transcribedText, item.createdAt)}
+                              title="Download .txt"
+                            >
+                              <History className="h-4 w-4 rotate-180" />
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm" 
+                              className="h-9 w-9 p-0 text-red-400 hover:text-red-500 hover:bg-red-500/10"
                               onClick={() => deleteHistoryItem(item._id)}
+                              title="Delete"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -724,8 +870,8 @@ export default function DashboardPage() {
                 </h3>
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6">
                   <div className="space-y-1">
-                    <p className="text-lg font-bold text-red-200">Wipe All Archives</p>
-                    <p className="text-sm text-red-400/60 max-w-sm leading-relaxed">This will permanently delete all your previous recordings and transcriptions. This action is irreversible.</p>
+                    <p className="text-lg font-bold text-red-600 dark:text-red-400">Wipe All Archives</p>
+                    <p className="text-sm text-zinc-600 dark:text-zinc-400 max-w-sm leading-relaxed">This will permanently delete all your previous recordings and transcriptions. This action is irreversible.</p>
                   </div>
                   <Button 
                     variant="ghost" 
