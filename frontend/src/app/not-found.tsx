@@ -58,7 +58,7 @@ export default function NotFound() {
             Signal Not Found
           </h2>
           <p className="text-muted-foreground text-lg mb-12 max-w-md mx-auto leading-relaxed">
-            The page you're looking for has faded into silence. It might have been moved, deleted, or never existed in the first place.
+            The page you&apos;re looking for has faded into silence. It might have been moved, deleted, or never existed in the first place.
           </p>
         </motion.div>
 

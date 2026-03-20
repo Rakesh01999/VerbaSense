@@ -1,6 +1,6 @@
 "use client"
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { jwtDecode } from 'jwt-decode'
 
@@ -56,13 +56,34 @@ function decodeUser(token: string): User | null {
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<User | null>(null)
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window !== 'undefined') {
+      const storedToken = localStorage.getItem('token')
+      if (storedToken && decodeUser(storedToken)) {
+        return storedToken
+      }
+    }
+    return null
+  })
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window !== 'undefined') {
+      const storedToken = localStorage.getItem('token')
+      const storedUser = localStorage.getItem('user')
+      if (storedToken && decodeUser(storedToken) && storedUser) {
+        try {
+          return JSON.parse(storedUser)
+        } catch {
+          return null
+        }
+      }
+    }
+    return null
+  })
   const [stats, setStats] = useState<UserStats | null>(null)
-  const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const router = useRouter()
 
-  const refreshUser = async () => {
+  const refreshUser = useCallback(async () => {
     const currentToken = localStorage.getItem('token') || token
     if (!currentToken) return
 
@@ -81,33 +102,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error refreshing user:', error)
     }
-  }
+  }, [token])
 
   useEffect(() => {
+    // Initial token validation and background refresh
     const storedToken = localStorage.getItem('token')
-    const storedUser = localStorage.getItem('user')
-
-    if (storedToken) {
-      const decoded = decodeUser(storedToken)
-      if (decoded) {
-        setToken(storedToken)
-        if (storedUser) {
-          try {
-            setUser(JSON.parse(storedUser))
-          } catch (e) {
-            console.error('Error parsing stored user:', e)
-          }
-        }
-        // Background refresh to get latest data
-        refreshUser()
-      } else {
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-      }
+    if (storedToken && decodeUser(storedToken)) {
+      Promise.resolve().then(() => refreshUser())
+    } else if (storedToken) {
+      // Cleanup invalid token
+      localStorage.removeItem('token')
+      localStorage.removeItem('user')
     }
-
-    setIsLoading(false)
-  }, [])
+    Promise.resolve().then(() => setIsLoading(false))
+  }, [refreshUser])
 
   /**
    * Call this after a successful API login.

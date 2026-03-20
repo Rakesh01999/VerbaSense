@@ -79,7 +79,7 @@ export default function RegisterPage() {
     }
   }
   
-  const handleGoogleSuccess = async (credentialResponse: any) => {
+  const handleGoogleSuccess = async (credentialResponse: { credential?: string }) => {
     if (!credentialResponse.credential) return
     
     setIsLoading(true)
@@ -158,7 +158,13 @@ export default function RegisterPage() {
                     <div className="relative group">
                       <div className="w-24 h-24 rounded-full bg-secondary/50 border-2 border-dashed border-border flex items-center justify-center overflow-hidden transition-all group-hover:border-purple-500/50">
                         {photoPreview ? (
-                          <img src={photoPreview} alt="Preview" className="w-full h-full object-cover" />
+                          <Image 
+                            src={photoPreview} 
+                            alt="Preview" 
+                            width={96}
+                            height={96}
+                            className="w-full h-full object-cover" 
+                          />
                         ) : (
                           <Camera className="w-8 h-8 text-muted-foreground group-hover:text-purple-500/50 transition-colors" />
                         )}

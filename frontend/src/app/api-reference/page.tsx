@@ -3,7 +3,6 @@
 import React from "react"
 import PageHero from "@/components/PageHero"
 import BackgroundEffects from "@/components/BackgroundEffects"
-import { motion } from "framer-motion"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export default function APIReferencePage() {

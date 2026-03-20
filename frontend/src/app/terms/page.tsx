@@ -29,7 +29,7 @@ export default function TermsOfServicePage() {
 
           <h2 className="text-2xl font-bold mb-6">3. Disclaimer</h2>
           <p className="text-muted-foreground leading-relaxed mb-8">
-            The materials on VerbaSense are provided 'as is'. VerbaSense makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties.
+            The materials on VerbaSense are provided &apos;as is&apos;. VerbaSense makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties.
           </p>
         </div>
       </section>

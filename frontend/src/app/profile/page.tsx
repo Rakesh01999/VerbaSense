@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 import { Mail, Shield, Zap, BarChart3, Clock, KeyRound, LogOut, Edit2, Check, X, Loader2, Camera, Calendar } from "lucide-react"
 import { apiUpdateProfile } from "@/lib/api"
 import Link from "next/link"
+import Image from "next/image"
 import { useToast } from "@/context/ToastContext"
 
 export default function ProfilePage() {
@@ -128,9 +129,11 @@ export default function ProfilePage() {
                   <div className="relative group">
                     <div className="w-24 h-24 rounded-2xl bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-4xl font-bold shadow-xl border-4 border-background overflow-hidden">
                       {photoPreview || user.photo ? (
-                        <img 
+                        <Image 
                           src={photoPreview || getPhotoUrl(user.photo) || ""} 
-                          alt={user.name} 
+                          alt={user.name || "Profile Photo"} 
+                          width={96}
+                          height={96}
                           className="w-full h-full object-cover" 
                         />
                       ) : (

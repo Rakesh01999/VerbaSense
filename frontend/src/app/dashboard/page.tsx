@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useCallback } from "react"
 import Link from "next/link"
 import { useAuth } from "@/context/AuthContext"
 import { useToast } from "@/context/ToastContext"
@@ -33,7 +33,6 @@ export default function DashboardPage() {
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const [uploadProgress, setUploadProgress] = useState(0)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   
   const [modalConfig, setModalConfig] = useState<{
@@ -51,17 +50,9 @@ export default function DashboardPage() {
   })
   
   const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder | null>(null)
-  const [audioChunks, setAudioChunks] = useState<Blob[]>([])
   const [transcriptionLanguage, setTranscriptionLanguage] = useState("en")
 
-  // Fetch history on mount or tab change
-  React.useEffect(() => {
-    if (activeTab === "history") {
-      fetchHistory()
-    }
-  }, [activeTab])
-
-  const fetchHistory = async () => {
+  const fetchHistory = useCallback(async () => {
     setIsLoadingHistory(true)
     try {
       const token = localStorage.getItem('token')
@@ -78,7 +69,14 @@ export default function DashboardPage() {
     } finally {
       setIsLoadingHistory(false)
     }
-  }
+  }, [showToast])
+
+  // Fetch history on mount or tab change
+  React.useEffect(() => {
+    if (activeTab === "history") {
+      fetchHistory()
+    }
+  }, [activeTab, fetchHistory])
 
   const deleteHistoryItem = (id: string) => {
     setModalConfig({
@@ -154,7 +152,6 @@ export default function DashboardPage() {
 
       recorder.start()
       setMediaRecorder(recorder)
-      setAudioChunks(chunks)
       setIsRecording(true)
       setTranscription("")
     } catch (err) {

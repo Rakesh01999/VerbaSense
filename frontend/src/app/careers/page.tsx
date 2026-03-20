@@ -28,7 +28,7 @@ export default function CareersPage() {
         <div className="max-w-4xl mx-auto">
           <div className="mb-16 text-center">
              <h2 className="text-3xl font-bold mb-4">Open Positions</h2>
-             <p className="text-muted-foreground">Don't see a role that fits? Email us anyway!</p>
+             <p className="text-muted-foreground">Don&apos;t see a role that fits? Email us anyway!</p>
           </div>
 
           <div className="space-y-4">

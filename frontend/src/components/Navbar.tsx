@@ -18,6 +18,14 @@ export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  
+  // Close menus on path change during render
+  const [prevPathname, setPrevPathname] = useState(pathname)
+  if (pathname !== prevPathname) {
+    setPrevPathname(pathname)
+    setMobileMenuOpen(false)
+    setUserMenuOpen(false)
+  }
 
   // Handle scroll effect
   useEffect(() => {
@@ -28,11 +36,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  // Close menus on path change
-  useEffect(() => {
-    setMobileMenuOpen(false)
-    setUserMenuOpen(false)
-  }, [pathname])
+
 
   const handleLogout = () => {
     logout()
@@ -110,7 +114,13 @@ export default function Navbar() {
                 <span className="text-sm font-medium text-foreground">{user?.name || user?.email?.split('@')[0]}</span>
                 <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-xs font-bold overflow-hidden border border-white/10 shadow-inner">
                   {user?.photo ? (
-                    <img src={getPhotoUrl(user.photo) || ""} alt={user.name || "User"} className="w-full h-full object-cover" />
+                    <Image 
+                      src={getPhotoUrl(user.photo) || ""} 
+                      alt={user.name || "User"} 
+                      width={32}
+                      height={32}
+                      className="w-full h-full object-cover" 
+                    />
                   ) : (
                     (user?.name?.[0] || user?.email?.[0] || "U").toUpperCase()
                   )}
