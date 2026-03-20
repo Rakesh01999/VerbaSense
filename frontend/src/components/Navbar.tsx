@@ -50,7 +50,7 @@ export default function Navbar() {
     // For local uploads, we need to point to the backend static folder
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
     const baseUrl = apiBase.replace("/api", "")
-    return `${baseUrl}/${photoPath}`
+    return encodeURI(`${baseUrl}/${photoPath}`)
   }
 
   const navLinks = [
