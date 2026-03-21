@@ -12,12 +12,12 @@ RUN apt-get update && apt-get install -y \
 WORKDIR /app
 
 # 1. Build whisper.cpp (CLI) and Download Model
-# We use -j1 to limit memory usage (critical for Render Free tier 512MB)
+# We build ONLY whisper-cli to save memory and time on Render Free tier
 RUN git clone https://github.com/ggerganov/whisper.cpp.git /tmp/whisper.cpp \
     && cd /tmp/whisper.cpp \
-    && make -j1 \
+    && make whisper-cli -j1 \
     && mkdir -p /app/bin \
-    && cp /tmp/whisper.cpp/main /app/bin/whisper-cli \
+    && cp /tmp/whisper.cpp/bin/whisper-cli /app/bin/whisper-cli \
     && wget -O /app/bin/ggml-base.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin \
     && rm -rf /tmp/whisper.cpp
 
