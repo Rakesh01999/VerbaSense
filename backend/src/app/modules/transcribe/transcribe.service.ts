@@ -10,12 +10,12 @@ if (ffmpegPath) {
 }
 
 const isWindows = process.platform === 'win32';
-const WHISPER_PATH = process.env.WHISPER_PATH || path.join(__dirname, `../../../../bin/whisper-cli${isWindows ? '.exe' : ''}`);
-const MODEL_PATH_EN = process.env.MODEL_PATH_EN || path.join(__dirname, '../../../../bin/ggml-base.en.bin');
-const MODEL_PATH_MULTI = process.env.MODEL_PATH_MULTI || path.join(__dirname, '../../../../bin/ggml-medium.bin');
+const WHISPER_PATH = process.env.WHISPER_PATH || path.join(process.cwd(), `bin/whisper-cli${isWindows ? '.exe' : ''}`);
+const MODEL_PATH_EN = process.env.MODEL_PATH_EN || path.join(process.cwd(), 'bin/ggml-base.en.bin');
+const MODEL_PATH_MULTI = process.env.MODEL_PATH_MULTI || path.join(process.cwd(), 'bin/ggml-medium.bin');
 
 // Ensure uploads directory exists
-const uploadsDir = path.join(__dirname, '../../../../uploads');
+const uploadsDir = path.join(process.cwd(), 'uploads');
 if (!fs.existsSync(uploadsDir)) {
     fs.mkdirSync(uploadsDir, { recursive: true });
 }

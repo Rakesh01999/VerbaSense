@@ -15,7 +15,7 @@ WORKDIR /app
 # We build ONLY whisper-cli using CMake to save memory and time
 RUN git clone https://github.com/ggerganov/whisper.cpp.git /tmp/whisper.cpp \
     && cd /tmp/whisper.cpp \
-    && cmake -B build \
+    && cmake -B build -DBUILD_SHARED_LIBS=OFF \
     && cmake --build build --config Release --target whisper-cli -j1 \
     && mkdir -p /app/bin \
     && cp /tmp/whisper.cpp/build/bin/whisper-cli /app/bin/whisper-cli \
