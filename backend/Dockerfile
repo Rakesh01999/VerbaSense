@@ -14,7 +14,7 @@ WORKDIR /app
 # We use -j1 to limit memory usage (critical for Render Free tier 512MB)
 RUN git clone https://github.com/ggerganov/whisper.cpp.git /tmp/whisper.cpp \
     && cd /tmp/whisper.cpp \
-    && make main -j1 \
+    && make -j1 \
     && mkdir -p /app/bin \
     && cp /tmp/whisper.cpp/main /app/bin/whisper-cli \
     && wget -O /app/bin/ggml-base.en.bin https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin \
