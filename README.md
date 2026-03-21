@@ -2,6 +2,10 @@
 
 VerbaSense is a premium, high-performance Speech-to-Text (STT) application that leverages the power of the Whisper transcription engine to provide accurate, local, and secure voice processing.
 
+## 🌐 Live Links
+- **Frontend App**: [https://verbasense.vercel.app](https://verbasense.vercel.app/)
+- **Backend API**: [https://verbasense.onrender.com](https://verbasense.onrender.com/)
+
 ## 🚀 Key Features
 
 - **Real-time Transcription**: High-accuracy voice-to-text conversion using Whisper.
