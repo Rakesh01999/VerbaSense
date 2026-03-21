@@ -9,7 +9,8 @@ if (ffmpegPath) {
     ffmpeg.setFfmpegPath(ffmpegPath);
 }
 
-const WHISPER_PATH = process.env.WHISPER_PATH || path.join(__dirname, '../../../../bin/whisper-cli.exe');
+const isWindows = process.platform === 'win32';
+const WHISPER_PATH = process.env.WHISPER_PATH || path.join(__dirname, `../../../../bin/whisper-cli${isWindows ? '.exe' : ''}`);
 const MODEL_PATH_EN = process.env.MODEL_PATH_EN || path.join(__dirname, '../../../../bin/ggml-base.en.bin');
 const MODEL_PATH_MULTI = process.env.MODEL_PATH_MULTI || path.join(__dirname, '../../../../bin/ggml-medium.bin');
 
@@ -98,7 +99,8 @@ export const transcribeAudio = async (audioPath: string, language: string = 'en'
         const languageFlag = language !== 'en' ? `-l ${language}` : '';
         
         // Simple command without prompts or complex shells to avoid mangling
-        const command = `whisper-cli.exe -m "${relativeModelPath}" -f "${relativeAudioPath}" ${languageFlag} -nt -np`;
+        const binName = isWindows ? 'whisper-cli.exe' : './whisper-cli';
+        const command = `${binName} -m "${relativeModelPath}" -f "${relativeAudioPath}" ${languageFlag} -nt -np`;
 
         console.log(`[Whisper] Executing: ${command}`);
 

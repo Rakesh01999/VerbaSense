@@ -63,11 +63,11 @@ export default function Home() {
               Start Building Free <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </Button>
-          <Button asChild variant="outline" size="lg" className="border-border text-foreground hover:bg-accent text-lg px-8 py-7 rounded-full font-bold transition-all">
+          {/* <Button asChild variant="outline" size="lg" className="border-border text-foreground hover:bg-accent text-lg px-8 py-7 rounded-full font-bold transition-all">
             <Link href="/login" className="flex items-center gap-2">
               <Play className="w-4 h-4 fill-current" /> Live Demo
             </Link>
-          </Button>
+          </Button> */}
         </motion.div>
 
         {/* Feature Cards */}

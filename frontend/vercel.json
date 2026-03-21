@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "framework": "nextjs",
+  "name": "verbasense-frontend",
+  "installCommand": "npm install",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "regions": ["sfo1"],
+  "env": {
+    "NEXT_PUBLIC_API_URL": "https://verbasense-api.onrender.com/api"
+  }
+}
