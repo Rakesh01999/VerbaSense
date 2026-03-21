@@ -89,26 +89,18 @@ export const transcribeAudio = async (audioPath: string, language: string = 'en'
         convertedPath = await convertToWhisperFormat(audioPath);
         const absoluteAudioPath = path.resolve(convertedPath);
 
-        // 2. Prepare command
-        const binDir = path.dirname(WHISPER_PATH);
-        const relativeModelPath = path.relative(binDir, modelPath);
-        const relativeAudioPath = path.relative(binDir, absoluteAudioPath);
-        
+        // 2. Prepare command using absolute paths
         // Use a unique output filename to avoid collisions
-        // Prepare command string
         const languageFlag = language !== 'en' ? `-l ${language}` : '';
         
-        // Simple command without prompts or complex shells to avoid mangling
-        const binName = isWindows ? 'whisper-cli.exe' : './whisper-cli';
-        const command = `${binName} -m "${relativeModelPath}" -f "${relativeAudioPath}" ${languageFlag} -nt -np`;
+        // Robust command using absolute paths
+        const command = `"${WHISPER_PATH}" -m "${modelPath}" -f "${absoluteAudioPath}" ${languageFlag} -nt -np`;
 
         console.log(`[Whisper] Executing: ${command}`);
-
         // 3. Execute transcription using simple exec
         const transcribedText = await new Promise<string>((resolve, reject) => {
-            exec(command, { cwd: binDir }, (error, stdout, stderr) => {
-                if (error) {
-                    console.error(`[Whisper] Execution Error: ${error.message}`);
+            exec(command, (error, stdout, stderr) => {
+                if (error) {                    console.error(`[Whisper] Execution Error: ${error.message}`);
                     return reject(new Error(`Transcription failed: ${error.message}`));
                 }
                 

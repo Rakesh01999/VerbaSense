@@ -11,14 +11,18 @@ const nextConfig: NextConfig = {
         pathname: '/uploads/**',
       },
       {
-        protocol: 'http',
-        hostname: '127.0.0.1',
-        port: '5000',
+        protocol: 'https',
+        hostname: 'verbasense.onrender.com',
         pathname: '/uploads/**',
       },
       {
         protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
+        hostname: '*.googleusercontent.com',
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'avatars.githubusercontent.com',
         pathname: '/**',
       }
     ],
