@@ -9,6 +9,7 @@ import catchAsync from '../../../shared/catchAsync';
 import AppError from '../../errors/AppError';
 import sendResponse from '../../utils/sendResponse';
 import { sendEmail, sendPasswordResetEmail } from '../../utils/sendEmail';
+import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinary';
 import { v4 as uuidv4 } from 'uuid';
  
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
@@ -24,12 +25,17 @@ export const register = catchAsync(async (req: Request, res: Response) => {
     // Generate verification token
     const verificationToken = uuidv4();
 
+    let photoUrl = undefined;
+    if (req.file) {
+        photoUrl = await uploadToCloudinary(req.file.path, 'profiles', 'image');
+    }
+
     user = new User({
         name,
         email,
         password,
         verificationToken,
-        photo: req.file ? `uploads/profiles/${req.file.filename}` : undefined
+        photo: photoUrl || undefined
     });
 
     await user.save();
@@ -304,7 +310,15 @@ export const updateMe = catchAsync(async (req: any, res: Response) => {
     }
 
     if (req.file) {
-        user.photo = `uploads/profiles/${req.file.filename}`;
+        // Delete old photo from cloud if it's there
+        if (user.photo && user.photo.includes('res.cloudinary.com')) {
+            await deleteFromCloudinary(user.photo, 'image');
+        }
+        
+        const newPhotoUrl = await uploadToCloudinary(req.file.path, 'profiles', 'image');
+        if (newPhotoUrl) {
+            user.photo = newPhotoUrl;
+        }
     }
 
     await user.save();
