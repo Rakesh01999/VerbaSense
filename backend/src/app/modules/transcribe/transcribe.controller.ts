@@ -4,6 +4,7 @@ import { transcribeAudio } from './transcribe.service';
 import Transcription from './transcribe.model';
 import catchAsync from '../../../shared/catchAsync';
 import sendResponse from '../../utils/sendResponse';
+import { uploadToCloudinary, deleteFromCloudinary } from '../../utils/cloudinary';
 
 export const uploadAndTranscribe = catchAsync(async (req: AuthRequest, res: Response) => {
     if (!req.file) {
@@ -14,9 +15,11 @@ export const uploadAndTranscribe = catchAsync(async (req: AuthRequest, res: Resp
     const language = req.body.language || 'en';
     const { text: transcribedText, duration } = await transcribeAudio(audioPath, language);
 
+    const cloudinaryUrl = await uploadToCloudinary(audioPath, 'audio', 'video');
+
     const newTranscription = new Transcription({
         user: (req.user as any)?.id || req.user,
-        audioUrl: audioPath,
+        audioUrl: cloudinaryUrl || audioPath,
         transcribedText,
         language,
         metadata: {
@@ -64,6 +67,10 @@ export const deleteTranscription = catchAsync(async (req: AuthRequest, res: Resp
         });
     }
 
+    if (transcription.audioUrl && transcription.audioUrl.includes('res.cloudinary.com')) {
+        await deleteFromCloudinary(transcription.audioUrl, 'video');
+    }
+
     sendResponse(res, {
         statusCode: 200,
         success: true,
@@ -73,6 +80,17 @@ export const deleteTranscription = catchAsync(async (req: AuthRequest, res: Resp
 });
 
 export const clearAllHistory = catchAsync(async (req: AuthRequest, res: Response) => {
+    const transcriptions = await Transcription.find({
+        user: (req.user as any)?.id || req.user
+    });
+
+    // Delete associated files from Cloudinary
+    for (const t of transcriptions) {
+        if (t.audioUrl && t.audioUrl.includes('res.cloudinary.com')) {
+            await deleteFromCloudinary(t.audioUrl, 'video');
+        }
+    }
+
     const result = await Transcription.deleteMany({
         user: (req.user as any)?.id || req.user
     });
