@@ -315,6 +315,9 @@ export default function DashboardPage() {
   }
 
   const getFullAudioUrl = (path: string) => {
+    // Cloudinary and other absolute URLs should be used as-is
+    if (path.startsWith('http')) return path;
+    // Legacy: local backend file path
     const apiBase = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api"
     const baseUrl = apiBase.replace("/api", "")
     return `${baseUrl}/${path}`
