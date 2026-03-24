@@ -28,7 +28,7 @@ RUN npm install
 
 # 3. Copy source and build TS
 COPY . .
-RUN npm install -g typescript
+RUN npm install -g typescript@5.4.5
 RUN npm run build
 
 # 4. Create uploads directory
