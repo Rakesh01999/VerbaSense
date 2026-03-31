@@ -41,8 +41,15 @@ export const register = catchAsync(async (req: Request, res: Response) => {
     await user.save();
 
     // Send verification email
-    const verificationLink = `${req.protocol}://${req.get('host')}/api/auth/verify-email/${verificationToken}`;
-    await sendEmail(user.email, verificationLink);
+    const backendUrl = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
+    const verificationLink = `${backendUrl}/api/auth/verify-email/${verificationToken}`;
+    
+    try {
+        await sendEmail(user.email, verificationLink);
+    } catch (error) {
+        console.error('Failed to send verification email during registration:', error);
+        throw new AppError(500, 'Registration successful, but we could not send a verification email. Please contact support or try again later.');
+    }
 
     sendResponse(res, {
         statusCode: 201,

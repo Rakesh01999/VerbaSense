@@ -12,6 +12,9 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// trust proxy
+app.set('trust proxy', true);
+
 // Connect to Database
 connectDB();
 
