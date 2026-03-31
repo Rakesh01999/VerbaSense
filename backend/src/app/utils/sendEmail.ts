@@ -2,33 +2,31 @@ import nodemailer from 'nodemailer';
 import AppError from '../errors/AppError';
 
 const createTransporter = () => {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.error('CRITICAL: EMAIL_USER or EMAIL_PASS environment variables are missing.');
-        throw new AppError(500, 'Email service is not configured on the server. Please add EMAIL_USER and EMAIL_PASS to your environment variables.');
+    const smtpUser = process.env.BREVO_SMTP_USER;
+    const smtpKey = process.env.BREVO_SMTP_KEY;
+    
+    if (!smtpUser || !smtpKey) {
+        console.error('CRITICAL: BREVO_SMTP_USER or BREVO_SMTP_KEY environment variables are missing.');
+        throw new AppError(500, 'Email service is not configured. Please add BREVO_SMTP_USER and BREVO_SMTP_KEY to your environment variables.');
     }
 
-    // Gmail App Passwords should be 16 characters with no spaces
-    const sanitizedPass = process.env.EMAIL_PASS.replace(/\s/g, '');
-
-    console.log(`Initializing SMTP transporter for: ${process.env.EMAIL_USER}`);
+    console.log(`Initializing Brevo SMTP transporter for: ${smtpUser}`);
 
     return nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp-relay.brevo.com',
+        port: 587,
+        secure: false, // Use STARTTLS
         auth: {
-            user: process.env.EMAIL_USER,
-            pass: sanitizedPass,
+            user: smtpUser,
+            pass: smtpKey,
         },
-        connectionTimeout: 60000, // 60s
-        greetingTimeout: 60000,   // 60s
-        logger: true, // Enable diagnostic logging
-        debug: true,  // Enable SMTP debug logging
     });
 };
 
 export const sendEmail = async (to: string, verificationLink: string) => {
     try {
         const transporter = createTransporter();
-        const fromEmail = process.env.EMAIL_USER || 'noreply@verbasense.com';
+        const fromEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
 
         await transporter.sendMail({
             from: `"VerbaSense Support" <${fromEmail}>`,
@@ -50,7 +48,7 @@ export const sendEmail = async (to: string, verificationLink: string) => {
     `,
         });
     } catch (error) {
-        console.error('Error sending verification email:', error);
+        console.error('Error sending email via Brevo:', error);
         throw error; // Rethrow to let the controller handle it
     }
 };
@@ -58,7 +56,7 @@ export const sendEmail = async (to: string, verificationLink: string) => {
 export const sendPasswordResetEmail = async (to: string, resetLink: string) => {
     try {
         const transporter = createTransporter();
-        const fromEmail = process.env.EMAIL_USER || 'noreply@verbasense.com';
+        const fromEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
 
         await transporter.sendMail({
             from: `"VerbaSense Support" <${fromEmail}>`,
@@ -90,11 +88,12 @@ export const sendPasswordResetEmail = async (to: string, resetLink: string) => {
 export const sendContactEmail = async (data: { firstName: string; lastName: string; email: string; message: string }) => {
     try {
         const transporter = createTransporter();
-        const fromEmail = process.env.EMAIL_USER || 'noreply@verbasense.com';
+        const fromEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
+        const adminEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com'; 
 
         await transporter.sendMail({
             from: `"VerbaSense Contact" <${fromEmail}>`,
-            to: fromEmail,
+            to: adminEmail,
             subject: `New Contact Message from ${data.firstName} ${data.lastName}`,
             text: `Name: ${data.firstName} ${data.lastName}\nEmail: ${data.email}\n\nMessage:\n${data.message}`,
             html: `
@@ -118,7 +117,7 @@ export const sendContactEmail = async (data: { firstName: string; lastName: stri
 export const sendVerificationCodeEmail = async (to: string, code: string) => {
     try {
         const transporter = createTransporter();
-        const fromEmail = process.env.EMAIL_USER || 'noreply@verbasense.com';
+        const fromEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
 
         await transporter.sendMail({
             from: `"VerbaSense Support" <${fromEmail}>`,
