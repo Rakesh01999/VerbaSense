@@ -7,13 +7,18 @@ const createTransporter = () => {
         throw new AppError(500, 'Email service is not configured on the server. Please add EMAIL_USER and EMAIL_PASS to your environment variables.');
     }
 
+    // Gmail App Passwords should be 16 characters with no spaces
+    const sanitizedPass = process.env.EMAIL_PASS.replace(/\s/g, '');
+
+    console.log(`Initializing SMTP transporter for: ${process.env.EMAIL_USER}`);
+
     return nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
         secure: true, // Gmail with port 465 uses SSL/TLS
         auth: {
             user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS,
+            pass: sanitizedPass,
         },
         tls: {
             rejectUnauthorized: false // Helps with cloud TLS handshake issues

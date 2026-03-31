@@ -39,7 +39,12 @@ export const sendContactVerificationCode = catchAsync(async (req: Request, res: 
         await sendVerificationCodeEmail(email, code);
         console.log(`Verification code sent successfully to ${email}`);
     } catch (error: any) {
-        console.error('Failed to send verification code email:', error);
+        console.error('ERROR in sendContactVerificationCode:', {
+            message: error.message,
+            stack: error.stack,
+            code: error.code,
+            command: error.command
+        });
         const errorMessage = error instanceof AppError ? error.message : 'Failed to send verification code to your email. Please try again later.';
         throw new AppError(500, errorMessage);
     }
