@@ -39,16 +39,18 @@ export const register = catchAsync(async (req: Request, res: Response) => {
     });
 
     await user.save();
-
+    console.log(`User created successfully: ${user.email}. Attempting to send verification email...`);
+    
     // Send verification email
     const backendUrl = process.env.BACKEND_URL || `${req.protocol}://${req.get('host')}`;
     const verificationLink = `${backendUrl}/api/auth/verify-email/${verificationToken}`;
     
     try {
         await sendEmail(user.email, verificationLink);
+        console.log(`Verification email sent to: ${user.email}`);
     } catch (error) {
-        console.error('Failed to send verification email during registration:', error);
-        throw new AppError(500, 'Registration successful, but we could not send a verification email. Please contact support or try again later.');
+        console.error('CRITICAL: Failed to send verification email during registration:', error);
+        throw new AppError(500, 'Account created, but we could not send a verification email. Please check your inbox again in a few minutes or try logging in to trigger a resend.');
     }
 
     sendResponse(res, {

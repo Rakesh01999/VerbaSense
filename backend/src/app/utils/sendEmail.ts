@@ -1,34 +1,26 @@
 import nodemailer from 'nodemailer';
 
 const createTransporter = () => {
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // Gmail with port 587 uses STARTTLS (secure: false)
+    return nodemailer.createTransport({
+        service: 'gmail',
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
         },
+        connectionTimeout: 10000, // 10s
+        greetingTimeout: 10000,   // 10s
+        logger: true, // Enable diagnostic logging
+        debug: true,  // Enable SMTP debug logging
     });
-
-    // Add connection timeout
-    transporter.verify((error, success) => {
-        if (error) {
-            console.error('SMTP Connection Error:', error);
-        } else {
-            console.log('SMTP Server is ready to take our messages');
-        }
-    });
-
-    return transporter;
 };
 
 export const sendEmail = async (to: string, verificationLink: string) => {
     try {
         const transporter = createTransporter();
+        const fromEmail = process.env.EMAIL_USER || 'noreply@verbasense.com';
 
         await transporter.sendMail({
-            from: '"VerbaSense Support" <noreply@verbasense.com>',
+            from: `"VerbaSense Support" <${fromEmail}>`,
             to,
             subject: 'VerbaSense - Verify your Email',
             text: '',
@@ -55,9 +47,10 @@ export const sendEmail = async (to: string, verificationLink: string) => {
 export const sendPasswordResetEmail = async (to: string, resetLink: string) => {
     try {
         const transporter = createTransporter();
+        const fromEmail = process.env.EMAIL_USER || 'noreply@verbasense.com';
 
         await transporter.sendMail({
-            from: '"VerbaSense Support" <noreply@verbasense.com>',
+            from: `"VerbaSense Support" <${fromEmail}>`,
             to,
             subject: 'VerbaSense - Reset Your Password',
             text: `You requested a password reset. Use the link below (valid for 1 hour):\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
@@ -86,11 +79,11 @@ export const sendPasswordResetEmail = async (to: string, resetLink: string) => {
 export const sendContactEmail = async (data: { firstName: string; lastName: string; email: string; message: string }) => {
     try {
         const transporter = createTransporter();
-        const adminEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
+        const fromEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
 
         await transporter.sendMail({
-            from: `"VerbaSense Contact" <${process.env.EMAIL_USER}>`,
-            to: adminEmail,
+            from: `"VerbaSense Contact" <${fromEmail}>`,
+            to: fromEmail,
             subject: `New Contact Message from ${data.firstName} ${data.lastName}`,
             text: `Name: ${data.firstName} ${data.lastName}\nEmail: ${data.email}\n\nMessage:\n${data.message}`,
             html: `
@@ -114,9 +107,10 @@ export const sendContactEmail = async (data: { firstName: string; lastName: stri
 export const sendVerificationCodeEmail = async (to: string, code: string) => {
     try {
         const transporter = createTransporter();
+        const fromEmail = process.env.EMAIL_USER || 'noreply@verbasense.com';
 
         await transporter.sendMail({
-            from: '"VerbaSense Support" <noreply@verbasense.com>',
+            from: `"VerbaSense Support" <${fromEmail}>`,
             to,
             subject: 'VerbaSense - Your Contact Verification Code',
             text: `Your verification code is: ${code}. It will expire in 10 minutes.`,
@@ -139,5 +133,6 @@ export const sendVerificationCodeEmail = async (to: string, code: string) => {
         throw error;
     }
 };
+
 
 

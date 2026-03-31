@@ -3,6 +3,9 @@ import jwt from 'jsonwebtoken';
 import Message from './message.model';
 import ContactVerification from './contact-verification.model';
 import { sendContactEmail, sendVerificationCodeEmail } from '../../utils/sendEmail';
+import catchAsync from '../../../shared/catchAsync';
+import AppError from '../../errors/AppError';
+import sendResponse from '../../utils/sendResponse';
 
 // Helper to validate email format
 const validateEmail = (email: string) => {
@@ -11,127 +14,110 @@ const validateEmail = (email: string) => {
 };
 
 // @desc    Send verification code to guest email
-export const sendContactVerificationCode = async (req: Request, res: Response) => {
-    try {
-        const { email } = req.body;
+export const sendContactVerificationCode = catchAsync(async (req: Request, res: Response) => {
+    const { email } = req.body;
 
-        if (!email || !validateEmail(email)) {
-            return res.status(400).json({
-                success: false,
-                message: 'Please provide a valid email address'
-            });
-        }
-
-        // Generate 6-digit code
-        const code = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
-
-        // Save or update verification record
-        await ContactVerification.findOneAndUpdate(
-            { email },
-            { code, expiresAt },
-            { upsert: true, new: true }
-        );
-
-        // Send email
-        await sendVerificationCodeEmail(email, code);
-
-        res.status(200).json({
-            success: true,
-            message: 'Verification code sent to your email'
-        });
-    } catch (error: any) {
-        console.error('Send verification code error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error'
-        });
+    if (!email || !validateEmail(email)) {
+        throw new AppError(400, 'Please provide a valid email address');
     }
-};
+
+    // Generate 6-digit code
+    const code = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
+
+    // Save or update verification record
+    await ContactVerification.findOneAndUpdate(
+        { email },
+        { code, expiresAt },
+        { upsert: true, new: true }
+    );
+
+    console.log(`Sending verification code ${code} to ${email}...`);
+
+    // Send email
+    try {
+        await sendVerificationCodeEmail(email, code);
+        console.log(`Verification code sent successfully to ${email}`);
+    } catch (error) {
+        console.error('Failed to send verification code email:', error);
+        throw new AppError(500, 'Failed to send verification code to your email. Please try again later.');
+    }
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Verification code sent to your email',
+        data: null
+    });
+});
 
 // @desc    Verify code only (for 3-step flow)
-export const verifyContactCode = async (req: Request, res: Response) => {
-    try {
-        const { email, code } = req.body;
+export const verifyContactCode = catchAsync(async (req: Request, res: Response) => {
+    const { email, code } = req.body;
 
-        if (!email || !code) {
-            return res.status(400).json({
-                success: false,
-                message: 'Email and code are required'
-            });
-        }
-
-        const verification = await ContactVerification.findOne({ email, code });
-
-        if (!verification || verification.expiresAt < new Date()) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid or expired verification code'
-            });
-        }
-
-        res.status(200).json({
-            success: true,
-            message: 'Email verified successfully'
-        });
-    } catch (error: any) {
-        console.error('Verify code error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error'
-        });
+    if (!email || !code) {
+        throw new AppError(400, 'Email and code are required');
     }
-};
+
+    const verification = await ContactVerification.findOne({ email, code });
+
+    if (!verification || verification.expiresAt < new Date()) {
+        throw new AppError(400, 'Invalid or expired verification code');
+    }
+
+    sendResponse(res, {
+        statusCode: 200,
+        success: true,
+        message: 'Email verified successfully',
+        data: null
+    });
+});
 
 // @desc    Verify code and submit message
-export const verifyCodeAndSubmit = async (req: Request, res: Response) => {
-    try {
-        const { firstName, lastName, email, message, code } = req.body;
+export const verifyCodeAndSubmit = catchAsync(async (req: Request, res: Response) => {
+    const { firstName, lastName, email, message, code } = req.body;
 
-        if (!firstName || !lastName || !email || !message || !code) {
-            return res.status(400).json({
-                success: false,
-                message: 'All fields are required, including verification code'
-            });
-        }
-
-        // Verify code
-        const verification = await ContactVerification.findOne({ email, code });
-
-        if (!verification || verification.expiresAt < new Date()) {
-            return res.status(400).json({
-                success: false,
-                message: 'Invalid or expired verification code'
-            });
-        }
-
-        // Delete verification record
-        await ContactVerification.deleteOne({ _id: verification._id });
-
-        // Save message to database
-        const newMessage = new Message({
-            firstName,
-            lastName,
-            email,
-            message
-        });
-        await newMessage.save();
-
-        // Send email to admin
-        await sendContactEmail({ firstName, lastName, email, message });
-
-        res.status(201).json({
-            success: true,
-            message: 'Your message has been sent successfully!'
-        });
-    } catch (error: any) {
-        console.error('Verify and submit error:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Internal server error'
-        });
+    if (!firstName || !lastName || !email || !message || !code) {
+        throw new AppError(400, 'All fields are required, including verification code');
     }
-};
+
+    // Verify code
+    const verification = await ContactVerification.findOne({ email, code });
+
+    if (!verification || verification.expiresAt < new Date()) {
+        throw new AppError(400, 'Invalid or expired verification code');
+    }
+
+    // Delete verification record
+    await ContactVerification.deleteOne({ _id: verification._id });
+
+    // Save message to database
+    const newMessage = new Message({
+        firstName,
+        lastName,
+        email,
+        message
+    });
+    await newMessage.save();
+
+    console.log(`Guest message saved from ${email}. Sending notification to admin...`);
+
+    // Send email to admin
+    try {
+        await sendContactEmail({ firstName, lastName, email, message });
+    } catch (error) {
+        console.error('Failed to send contact notification email to admin:', error);
+        // We don't throw here as the message is already saved in DB
+    }
+
+    sendResponse(res, {
+        statusCode: 201,
+        success: true,
+        message: 'Your message has been sent successfully!',
+        data: null
+    });
+});
+
 
 // @desc    Submit message for authenticated users (skips verification)
 export const submitContactForm = async (req: Request, res: Response) => {
