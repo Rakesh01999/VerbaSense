@@ -1,10 +1,5 @@
 import nodemailer from 'nodemailer';
-import dns from 'dns';
 import AppError from '../errors/AppError';
-
-// Force Node.js to prefer IPv4 over IPv6. 
-// This fixes the ENETUNREACH error on Render's network which has no IPv6 route.
-dns.setDefaultResultOrder('ipv4first');
 
 const createTransporter = () => {
     if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
@@ -19,8 +14,8 @@ const createTransporter = () => {
 
     return nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, // Gmail with port 465 uses SSL/TLS
+        port: 587,
+        secure: false, // Gmail with port 587 uses STARTTLS
         auth: {
             user: process.env.EMAIL_USER,
             pass: sanitizedPass,
