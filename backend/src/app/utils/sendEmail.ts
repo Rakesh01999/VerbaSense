@@ -1,39 +1,65 @@
-import nodemailer from 'nodemailer';
 import AppError from '../errors/AppError';
 
-const createTransporter = () => {
-    const smtpUser = process.env.BREVO_SMTP_USER;
-    const smtpKey = process.env.BREVO_SMTP_KEY;
-    
-    if (!smtpUser || !smtpKey) {
-        console.error('CRITICAL: BREVO_SMTP_USER or BREVO_SMTP_KEY environment variables are missing.');
-        throw new AppError(500, 'Email service is not configured. Please add BREVO_SMTP_USER and BREVO_SMTP_KEY to your environment variables.');
+// Brevo Business logic
+const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
+
+/**
+ * Helper function to send emails using the Brevo HTTP API.
+ * This is the MOST robust method for cloud providers like Render because it
+ * uses standard HTTPS traffic (Port 443) which is never blocked.
+ */
+const sendBrevoEmail = async (payload: {
+    to: { email: string; name?: string }[];
+    subject: string;
+    htmlContent: string;
+    textContent?: string;
+}) => {
+    // Use BREVO_API_KEY (should start with xkeysib-)
+    const apiKey = process.env.BREVO_API_KEY || process.env.BREVO_SMTP_KEY;
+    const senderEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
+
+    if (!apiKey || apiKey.startsWith('xsmtpsib-')) {
+        console.error('CRITICAL: Invalid or missing Brevo API Key. You are using an SMTP key (xsmtpsib-), but the HTTP API requires a V3 API Key (xkeysib-).');
+        throw new AppError(500, 'Email service is not configured correctly. Please add BREVO_API_KEY (starting with xkeysib-) to your environment. SMTP keys are not supported for this method.');
     }
 
-    console.log(`Initializing Brevo SMTP transporter for: ${smtpUser}`);
+    try {
+        const response = await fetch(BREVO_API_URL, {
+            method: 'POST',
+            headers: {
+                'Accept': 'application/json',
+                'api-key': apiKey,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                sender: { name: 'VerbaSense', email: senderEmail },
+                to: payload.to,
+                subject: payload.subject,
+                htmlContent: payload.htmlContent,
+                textContent: payload.textContent || ''
+            })
+        });
 
-    return nodemailer.createTransport({
-        host: 'smtp-relay.brevo.com',
-        port: 587,
-        secure: false, // Use STARTTLS
-        auth: {
-            user: smtpUser,
-            pass: smtpKey,
-        },
-    });
+        const result: any = await response.json();
+
+        if (!response.ok) {
+            console.error('Brevo API Error Response:', result);
+            throw new AppError(response.status, `Brevo API Error: ${result.message || 'Unknown error'}`);
+        }
+
+        console.log('Email sent successfully via Brevo API');
+        return result;
+    } catch (error: any) {
+        console.error('Error in sendBrevoEmail:', error);
+        throw new AppError(500, error.message || 'Failed to send email via Brevo API');
+    }
 };
 
 export const sendEmail = async (to: string, verificationLink: string) => {
-    try {
-        const transporter = createTransporter();
-        const fromEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
-
-        await transporter.sendMail({
-            from: `"VerbaSense Support" <${fromEmail}>`,
-            to,
-            subject: 'VerbaSense - Verify your Email',
-            text: '',
-            html: `
+    await sendBrevoEmail({
+        to: [{ email: to }],
+        subject: 'VerbaSense - Verify your Email',
+        htmlContent: `
       <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px; max-width: 600px; margin: auto;">
         <h2 style="color: #333;">Welcome to VerbaSense!</h2>
         <p>Thank you for registering. Please confirm your email address to activate your account.</p>
@@ -46,24 +72,15 @@ export const sendEmail = async (to: string, verificationLink: string) => {
         <p>Best Regards,<br />The VerbaSense Team</p>
       </div>
     `,
-        });
-    } catch (error) {
-        console.error('Error sending email via Brevo:', error);
-        throw error; // Rethrow to let the controller handle it
-    }
+        textContent: `Welcome to VerbaSense!\n\nThank you for registering. Please confirm your email address by visiting the following link:\n\n${verificationLink}\n\nBest Regards,\nThe VerbaSense Team`
+    });
 };
 
 export const sendPasswordResetEmail = async (to: string, resetLink: string) => {
-    try {
-        const transporter = createTransporter();
-        const fromEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
-
-        await transporter.sendMail({
-            from: `"VerbaSense Support" <${fromEmail}>`,
-            to,
-            subject: 'VerbaSense - Reset Your Password',
-            text: `You requested a password reset. Use the link below (valid for 1 hour):\n\n${resetLink}\n\nIf you did not request this, please ignore this email.`,
-            html: `
+    await sendBrevoEmail({
+        to: [{ email: to }],
+        subject: 'VerbaSense - Reset Your Password',
+        htmlContent: `
       <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px; max-width: 600px; margin: auto;">
         <h2 style="color: #333;">Reset Your Password</h2>
         <p>We received a request to reset the password for your VerbaSense account.</p>
@@ -78,25 +95,17 @@ export const sendPasswordResetEmail = async (to: string, resetLink: string) => {
         <p>Best Regards,<br />The VerbaSense Team</p>
       </div>
     `,
-        });
-    } catch (error) {
-        console.error('Error sending password reset email:', error);
-        throw error;
-    }
+        textContent: `You requested a password reset. Use the link below (valid for 1 hour):\n\n${resetLink}`
+    });
 };
 
 export const sendContactEmail = async (data: { firstName: string; lastName: string; email: string; message: string }) => {
-    try {
-        const transporter = createTransporter();
-        const fromEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
-        const adminEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com'; 
+    const adminEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
 
-        await transporter.sendMail({
-            from: `"VerbaSense Contact" <${fromEmail}>`,
-            to: adminEmail,
-            subject: `New Contact Message from ${data.firstName} ${data.lastName}`,
-            text: `Name: ${data.firstName} ${data.lastName}\nEmail: ${data.email}\n\nMessage:\n${data.message}`,
-            html: `
+    await sendBrevoEmail({
+        to: [{ email: adminEmail }],
+        subject: `New Contact Message from ${data.firstName} ${data.lastName}`,
+        htmlContent: `
       <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px; max-width: 600px; margin: auto;">
         <h2 style="color: #333;">New Contact Message</h2>
         <p><strong>From:</strong> ${data.firstName} ${data.lastName} (${data.email})</p>
@@ -107,24 +116,15 @@ export const sendContactEmail = async (data: { firstName: string; lastName: stri
         <p>Best Regards,<br />The VerbaSense System</p>
       </div>
     `,
-        });
-    } catch (error) {
-        console.error('Error sending contact email:', error);
-        throw error;
-    }
+        textContent: `Name: ${data.firstName} ${data.lastName}\nEmail: ${data.email}\n\nMessage:\n${data.message}`
+    });
 };
 
 export const sendVerificationCodeEmail = async (to: string, code: string) => {
-    try {
-        const transporter = createTransporter();
-        const fromEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
-
-        await transporter.sendMail({
-            from: `"VerbaSense Support" <${fromEmail}>`,
-            to,
-            subject: 'VerbaSense - Your Contact Verification Code',
-            text: `Your verification code is: ${code}. It will expire in 10 minutes.`,
-            html: `
+    await sendBrevoEmail({
+        to: [{ email: to }],
+        subject: 'VerbaSense - Your Contact Verification Code',
+        htmlContent: `
       <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 5px; max-width: 600px; margin: auto;">
         <h2 style="color: #333;">Verification Code</h2>
         <p>You requested to send a message to VerbaSense. Please use the following code to verify your email address:</p>
@@ -137,12 +137,6 @@ export const sendVerificationCodeEmail = async (to: string, code: string) => {
         <p>Best Regards,<br />The VerbaSense Team</p>
       </div>
     `,
-        });
-    } catch (error) {
-        console.error('Error sending verification code email:', error);
-        throw error;
-    }
+        textContent: `Your verification code is: ${code}. It will expire in 10 minutes.`
+    });
 };
-
-
-
