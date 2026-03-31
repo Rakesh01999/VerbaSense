@@ -1,14 +1,25 @@
 import nodemailer from 'nodemailer';
+import AppError from '../errors/AppError';
 
 const createTransporter = () => {
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.error('CRITICAL: EMAIL_USER or EMAIL_PASS environment variables are missing.');
+        throw new AppError(500, 'Email service is not configured on the server. Please add EMAIL_USER and EMAIL_PASS to your environment variables.');
+    }
+
     return nodemailer.createTransport({
-        service: 'gmail',
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // Gmail with port 465 uses SSL/TLS
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS,
         },
-        connectionTimeout: 10000, // 10s
-        greetingTimeout: 10000,   // 10s
+        tls: {
+            rejectUnauthorized: false // Helps with cloud TLS handshake issues
+        },
+        connectionTimeout: 30000, // 30s
+        greetingTimeout: 30000,   // 30s
         logger: true, // Enable diagnostic logging
         debug: true,  // Enable SMTP debug logging
     });
@@ -79,7 +90,7 @@ export const sendPasswordResetEmail = async (to: string, resetLink: string) => {
 export const sendContactEmail = async (data: { firstName: string; lastName: string; email: string; message: string }) => {
     try {
         const transporter = createTransporter();
-        const fromEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
+        const fromEmail = process.env.EMAIL_USER || 'noreply@verbasense.com';
 
         await transporter.sendMail({
             from: `"VerbaSense Contact" <${fromEmail}>`,

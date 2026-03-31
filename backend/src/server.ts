@@ -20,7 +20,7 @@ connectDB();
 
 // Middleware
 app.use(cors({
-    origin: ['https://verbasense.vercel.app', 'http://localhost:3000', 'http://localhost:5173'],
+    origin: ['https://verbasense.vercel.app', 'https://verbasense.vercel.app/', 'http://localhost:3000', 'http://localhost:5173'],
     credentials: true,
     methods: ['GET', 'POST', 'PATCH', 'DELETE', 'PUT', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']

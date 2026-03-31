@@ -48,9 +48,10 @@ export const register = catchAsync(async (req: Request, res: Response) => {
     try {
         await sendEmail(user.email, verificationLink);
         console.log(`Verification email sent to: ${user.email}`);
-    } catch (error) {
+    } catch (error: any) {
         console.error('CRITICAL: Failed to send verification email during registration:', error);
-        throw new AppError(500, 'Account created, but we could not send a verification email. Please check your inbox again in a few minutes or try logging in to trigger a resend.');
+        const errorMessage = error instanceof AppError ? error.message : 'Account created, but we could not send a verification email. Please check your inbox again in a few minutes or try logging in to trigger a resend.';
+        throw new AppError(500, errorMessage);
     }
 
     sendResponse(res, {
