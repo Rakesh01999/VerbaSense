@@ -13,18 +13,13 @@ const createTransporter = () => {
     console.log(`Initializing SMTP transporter for: ${process.env.EMAIL_USER}`);
 
     return nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 587,
-        secure: false, // Gmail with port 587 uses STARTTLS
+        service: 'gmail',
         auth: {
             user: process.env.EMAIL_USER,
             pass: sanitizedPass,
         },
-        tls: {
-            rejectUnauthorized: false // Helps with cloud TLS handshake issues
-        },
-        connectionTimeout: 30000, // 30s
-        greetingTimeout: 30000,   // 30s
+        connectionTimeout: 60000, // 60s
+        greetingTimeout: 60000,   // 60s
         logger: true, // Enable diagnostic logging
         debug: true,  // Enable SMTP debug logging
     });
