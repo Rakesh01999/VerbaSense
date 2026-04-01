@@ -60,7 +60,7 @@ export default function Home() {
         >
           <Button asChild size="lg" className="bg-primary text-primary-foreground hover:bg-primary/90 text-lg px-8 py-7 rounded-full font-bold transition-all hover:scale-105 active:scale-95 shadow-xl shadow-primary/10">
             <Link href="/register" className="flex items-center">
-              Start Building Free <ArrowRight className="ml-2 w-5 h-5" />
+              Start Transcribing Free <ArrowRight className="ml-2 w-5 h-5" />
             </Link>
           </Button>
           {/* <Button asChild variant="outline" size="lg" className="border-border text-foreground hover:bg-accent text-lg px-8 py-7 rounded-full font-bold transition-all">
