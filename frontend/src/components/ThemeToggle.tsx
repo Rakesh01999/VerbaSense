@@ -22,7 +22,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-      className="relative w-10 h-10 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 transition-colors overflow-hidden"
+      className="relative w-10 h-10 rounded-full bg-secondary/50 border border-border hover:bg-secondary hover:border-primary/50 transition-colors overflow-hidden flex items-center justify-center shadow-sm"
     >
       <AnimatePresence mode="wait" initial={false}>
         {theme === "dark" ? (
