@@ -184,7 +184,7 @@ export default function ContactPage() {
                 </div>
                 <div>
                   <p className="text-sm text-muted-foreground">Portfolio Website</p>
-                  <a href="https://rakesh-biswas-portfolio-nextjs.vercel.app/" target="_blank" rel="noopener noreferrer" className="font-bold hover:text-purple-500 transition-colors">Visit My Portfolio</a>
+                  <a href="https://rakesh-biswas-portfolio-nextjs.vercel.app/" target="_blank" rel="noopener noreferrer" className="font-bold hover:text-purple-500 transition-colors">Visit Portfolio</a>
                 </div>
               </div>
               <div className="flex items-center gap-4">
