@@ -7,7 +7,7 @@ import { useToast } from "@/context/ToastContext"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Image from "next/image"
-import { Mic, Square, Loader2, LogOut, History, Settings, User, Copy, Trash2, ChevronLeft, ChevronRight, Clock, AlertCircle, LayoutDashboard, UploadCloud, BarChart3, Star, FileText } from "lucide-react"
+import { Mic, Square, Loader2, LogOut, History, Settings, User, Copy, Trash2, ChevronLeft, ChevronRight, Clock, AlertCircle, LayoutDashboard, UploadCloud, BarChart3, Star, FileText, Menu, X } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { ConfirmationModal } from "@/components/ui/confirmation-modal"
 
@@ -34,6 +34,7 @@ export default function DashboardPage() {
   const [history, setHistory] = useState<TranscriptionItem[]>([])
   const [isLoadingHistory, setIsLoadingHistory] = useState(false)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false)
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   
@@ -474,20 +475,14 @@ export default function DashboardPage() {
           isSidebarCollapsed ? "md:ml-22" : "md:ml-72"
         }`}
       >
-        <header className="flex justify-between items-center mb-10 md:hidden bg-card/50 backdrop-blur-md p-4 rounded-2xl border border-border/50">
-          <div className="flex items-center gap-3">
-            <div className="relative w-9 h-9">
-              <Image 
-                src="/verbasense_logo.png" 
-                alt="VerbaSense Logo" 
-                fill
-                className="object-contain"
-              />
-            </div>
-            <span className="font-bold text-xl brand-text">VerbaSense</span>
-          </div>
-          <Button variant="ghost" size="icon" onClick={handleLogout} className="rounded-full hover:bg-red-500/10 hover:text-red-500">
-            <LogOut className="w-5 h-5" />
+        <header className="flex items-center mb-6 md:hidden">
+          <Button 
+            variant="outline" 
+            onClick={() => setIsMobileMenuOpen(true)} 
+            className="flex items-center gap-3 rounded-2xl text-foreground font-bold border-primary/20 bg-primary/5 hover:bg-primary/10 transition-colors shadow-sm"
+          >
+            <Menu className="w-5 h-5 text-primary" /> 
+            <span>Workspace Menu</span>
           </Button>
         </header>
 
@@ -1201,6 +1196,92 @@ export default function DashboardPage() {
           )}
         </section>
       </main>
+
+      {/* Mobile Drawer */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="fixed inset-0 bg-background/80 backdrop-blur-sm z-[60] md:hidden"
+            />
+            <motion.div
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "spring", bounce: 0, duration: 0.4 }}
+              className="fixed left-0 top-0 bottom-0 w-3/4 max-w-sm bg-card z-[70] p-6 flex flex-col md:hidden border-r border-border shadow-2xl overflow-y-auto"
+            >
+              <div className="flex justify-between items-center mb-10">
+                <div className="flex items-center gap-3">
+                  <div className="relative w-8 h-8">
+                    <Image src="/verbasense_logo.png" alt="VerbaSense Logo" fill className="object-contain" />
+                  </div>
+                  <span className="font-bold text-xl brand-text leading-tight">VerbaSense</span>
+                </div>
+                <Button variant="ghost" size="icon" onClick={() => setIsMobileMenuOpen(false)} className="rounded-full bg-muted/50 text-muted-foreground hover:bg-muted hover:text-foreground">
+                  <X className="w-5 h-5" />
+                </Button>
+              </div>
+
+              <div className="flex-1 space-y-8">
+                {navigation.map((group) => (
+                  <div key={group.group} className="space-y-3">
+                    <h3 className="px-3 text-[10px] font-black tracking-[0.2em] text-muted-foreground/40 uppercase mb-3">
+                      {group.group}
+                    </h3>
+                    <div className="space-y-1">
+                      {group.items.map((item) => (
+                        <Button 
+                          key={item.id}
+                          variant="ghost" 
+                          className={`w-full justify-start px-4 h-12 transition-all rounded-xl ${
+                            activeTab === item.id 
+                              ? "bg-primary/10 text-primary border border-primary/20" 
+                              : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                          }`}
+                          onClick={() => {
+                            setActiveTab(item.id)
+                            setIsMobileMenuOpen(false)
+                          }}
+                        >
+                          <item.icon className={`mr-4 w-5 h-5 shrink-0 ${activeTab === item.id ? "text-primary" : "text-muted-foreground"}`} />
+                          <span className={`${activeTab === item.id ? "font-bold" : "font-medium"} text-sm`}>{item.label}</span>
+                        </Button>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <div className="mt-8 pt-6 border-t border-border/50">
+                  <div className="flex items-center gap-4 px-3 py-3 rounded-2xl bg-muted/30 border border-border/50 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-purple-500/20 to-blue-500/20 flex items-center justify-center border border-primary/10">
+                      <User className="w-5 h-5 text-primary/80" />
+                    </div>
+                    <div className="flex flex-col min-w-0">
+                      <span className="text-sm font-bold truncate text-foreground leading-tight">{user?.email?.split('@')[0]}</span>
+                      <span className="text-[10px] text-primary font-bold uppercase tracking-widest mt-0.5">View Profile</span>
+                    </div>
+                  </div>
+                  <Button 
+                    variant="ghost" 
+                    className="w-full h-12 justify-center text-red-500 hover:bg-red-500/10 hover:text-red-500 font-bold rounded-xl"
+                    onClick={() => {
+                      handleLogout()
+                      setIsMobileMenuOpen(false)
+                    }}
+                  >
+                    Sign Out
+                  </Button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       <ConfirmationModal
         isOpen={modalConfig.isOpen}

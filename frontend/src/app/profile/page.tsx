@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { useAuth } from "@/context/AuthContext"
 import BackgroundEffects from "@/components/BackgroundEffects"
@@ -22,6 +22,28 @@ export default function ProfilePage() {
   const [photoFile, setPhotoFile] = useState<File | null>(null)
   const [photoPreview, setPhotoPreview] = useState<string | null>(null)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [historyDuration, setHistoryDuration] = useState("0:00")
+
+  useEffect(() => {
+    const fetchHistoryDuration = async () => {
+      if (!token) return
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/transcribe/history`, {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        const result = await response.json()
+        if (result.success) {
+          const totalSecs = result.data.reduce((acc: number, item: any) => acc + (item.metadata?.duration || 0), 0)
+          const mins = Math.floor(totalSecs / 60)
+          const secs = Math.floor(totalSecs % 60)
+          setHistoryDuration(`${mins}:${secs.toString().padStart(2, '0')}`)
+        }
+      } catch (error) {
+        console.error("Error fetching history duration:", error)
+      }
+    }
+    fetchHistoryDuration()
+  }, [token])
 
   const getPhotoUrl = (photoPath?: string) => {
     if (!photoPath) return null
@@ -49,8 +71,8 @@ export default function ProfilePage() {
   }
 
   const statsDisplay = [
-    { label: "Minutes Processed", value: stats?.totalMinutes || "0", icon: <Clock className="w-5 h-5 text-blue-500" /> },
-    { label: "Success Rate", value: `${stats?.averageAccuracy || "99.8"}%`, icon: <Zap className="w-5 h-5 text-yellow-500" /> },
+    { label: "Lifetime Minutes (API)", value: stats?.totalMinutes || "0", icon: <Clock className="w-5 h-5 text-blue-500" /> },
+    { label: "Live Dashboard Time", value: historyDuration, icon: <Zap className="w-5 h-5 text-yellow-500" /> },
     { label: "Total Files", value: stats?.totalTranscriptions || "0", icon: <BarChart3 className="w-5 h-5 text-purple-500" /> },
   ]
 
@@ -287,7 +309,7 @@ export default function ProfilePage() {
               <Card className="bg-gradient-to-br from-purple-50 to-blue-50 dark:from-zinc-900 dark:to-black border-purple-500/20 overflow-hidden relative">
                 <div className="absolute top-0 right-0 w-32 h-32 bg-purple-500/10 blur-3xl rounded-full -mr-16 -mt-16" />
                 <CardContent className="p-8 relative z-10">
-                  <h3 className="text-xl font-bold mb-2 text-zinc-900 dark:text-zinc-100">Ready for your next project?</h3>
+                  <h3 className="text-xl font-bold mb-2 text-zinc-900 dark:text-zinc-100">Ready for your next transcription?</h3>
                   <p className="text-zinc-600 dark:text-zinc-400 mb-6">Your current usage shows consistent processing efficiency. Start a new transcription to continue your workflow.</p>
                   <Button asChild className="bg-purple-600 hover:bg-purple-700 text-white rounded-xl px-8 shadow-lg shadow-purple-500/20">
                     <Link href="/dashboard">Return to Dashboard</Link>
