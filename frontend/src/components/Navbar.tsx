@@ -164,8 +164,13 @@ export default function Navbar() {
               <Button asChild variant="ghost" className="text-muted-foreground hover:text-foreground">
                 <Link href="/login">Login</Link>
               </Button>
-              <Button asChild className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full px-6">
-                <Link href="/register">Get Started</Link>
+              <Button asChild className="relative overflow-hidden group rounded-full px-8 bg-foreground text-background font-bold transition-all duration-300 hover:shadow-[0_0_25px_rgba(168,85,247,0.5)] hover:-translate-y-1 border border-border/50 hover:border-transparent">
+                <Link href="/register">
+                  <span className="relative z-10 group-hover:text-white transition-colors duration-300">
+                    Get Started
+                  </span>
+                  <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-blue-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                </Link>
               </Button>
             </>
           )}
@@ -212,7 +217,9 @@ export default function Navbar() {
               ) : (
                 <>
                   <Link href="/login" className="text-lg font-medium text-muted-foreground">Login</Link>
-                  <Link href="/register" className="text-lg font-medium text-foreground">Get Started</Link>
+                  <Link href="/register" className="text-lg font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-blue-500 mt-2 hover:scale-[1.02] transition-transform w-max">
+                    Get Started <ChevronDown className="-rotate-90 inline w-5 h-5 text-blue-500/70 relative top-[-1px]" />
+                  </Link>
                 </>
               )}
             </div>
