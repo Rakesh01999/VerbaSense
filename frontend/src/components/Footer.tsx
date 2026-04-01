@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { Github, Twitter, Linkedin, Mail } from "lucide-react"
+import { Github, Facebook, Send, MessageCircle, Globe, Mail } from "lucide-react"
 import Image from "next/image"
 
 export default function Footer() {
@@ -56,15 +56,21 @@ export default function Footer() {
             <p className="text-muted-foreground max-w-sm mb-8 leading-relaxed">
               VerbaSense is a professional speech-to-text platform designed for developers and businesses who demand precision and speed.
             </p>
-            <div className="flex gap-4">
-              <a href="#" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
+            <div className="flex flex-wrap gap-4">
+              <a href="https://github.com/Rakesh01999" target="_blank" rel="noopener noreferrer" aria-label="Github" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
                 <Github className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
-                <Twitter className="w-5 h-5" />
+              <a href="https://www.facebook.com/RakeshBiswasFB" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
+                <Facebook className="w-5 h-5" />
               </a>
-              <a href="#" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
-                <Linkedin className="w-5 h-5" />
+              <a href="https://t.me/Rakesh01999" target="_blank" rel="noopener noreferrer" aria-label="Telegram" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
+                <Send className="w-5 h-5" />
+              </a>
+              <a href="http://wa.me/+8801999647103" target="_blank" rel="noopener noreferrer" aria-label="WhatsApp" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
+                <MessageCircle className="w-5 h-5" />
+              </a>
+              <a href="https://rakesh-biswas-portfolio-nextjs.vercel.app/" target="_blank" rel="noopener noreferrer" aria-label="Portfolio" className="w-10 h-10 rounded-full bg-secondary border border-border flex items-center justify-center text-muted-foreground hover:bg-accent hover:text-foreground transition-all">
+                <Globe className="w-5 h-5" />
               </a>
             </div>
           </div>

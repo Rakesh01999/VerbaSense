@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
-import { Mail, MessageSquare, Phone, CheckCircle2, AlertCircle, Loader2, ShieldCheck, User, ArrowRight, ArrowLeft } from "lucide-react"
+import { Mail, MessageSquare, Phone, CheckCircle2, AlertCircle, Loader2, ShieldCheck, User, ArrowRight, ArrowLeft, Globe } from "lucide-react"
 import { useAuth } from "@/context/AuthContext"
 
 export default function ContactPage() {
@@ -180,11 +180,11 @@ export default function ContactPage() {
             <div className="space-y-6">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-purple-500/10 flex items-center justify-center text-purple-500">
-                  <Mail className="w-6 h-6" />
+                  <Globe className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Email us</p>
-                  <p className="font-bold">hello@verbasense.ai</p>
+                  <p className="text-sm text-muted-foreground">Portfolio Website</p>
+                  <a href="https://rakesh-biswas-portfolio-nextjs.vercel.app/" target="_blank" rel="noopener noreferrer" className="font-bold hover:text-purple-500 transition-colors">Visit My Portfolio</a>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -192,8 +192,8 @@ export default function ContactPage() {
                    <MessageSquare className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Live Chat</p>
-                  <p className="font-bold">Available Mon-Fri, 9am-6pm PST</p>
+                  <p className="text-sm text-muted-foreground">Telegram Direct</p>
+                  <a href="https://t.me/Rakesh01999" target="_blank" rel="noopener noreferrer" className="font-bold hover:text-blue-500 transition-colors">@Rakesh01999</a>
                 </div>
               </div>
               <div className="flex items-center gap-4">
@@ -201,8 +201,8 @@ export default function ContactPage() {
                   <Phone className="w-6 h-6" />
                 </div>
                 <div>
-                  <p className="text-sm text-muted-foreground">Call sales</p>
-                  <p className="font-bold">+1 (555) 123-4567</p>
+                  <p className="text-sm text-muted-foreground">WhatsApp Chat</p>
+                  <a href="http://wa.me/+8801999647103" target="_blank" rel="noopener noreferrer" className="font-bold hover:text-green-500 transition-colors">+88 01999-647103</a>
                 </div>
               </div>
             </div>
