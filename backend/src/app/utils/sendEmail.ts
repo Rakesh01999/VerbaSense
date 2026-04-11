@@ -5,7 +5,7 @@ const BREVO_API_URL = 'https://api.brevo.com/v3/smtp/email';
 
 /**
  * Helper function to send emails using the Brevo HTTP API.
- * This is the MOST robust method for cloud providers like Render because it
+ * Robust method for cloud providers like Render, cause it
  * uses standard HTTPS traffic (Port 443) which is never blocked.
  */
 const sendBrevoEmail = async (payload: {
@@ -19,8 +19,8 @@ const sendBrevoEmail = async (payload: {
     const senderEmail = process.env.EMAIL_USER || 'rbiswas01999@gmail.com';
 
     if (!apiKey || apiKey.startsWith('xsmtpsib-')) {
-        console.error('CRITICAL: Invalid or missing Brevo API Key. You are using an SMTP key (xsmtpsib-), but the HTTP API requires a V3 API Key (xkeysib-).');
-        throw new AppError(500, 'Email service is not configured correctly. Please add BREVO_API_KEY (starting with xkeysib-) to your environment. SMTP keys are not supported for this method.');
+        console.error('[EmailService] Initialization Error: Missing or invalid API Key type. Expected HTTP API V3 Key (xkeysib-), but received SMTP Key (xsmtpsib-).');
+        throw new AppError(500, 'Email service is temporarily unavailable. Please try again later.');
     }
 
     try {
