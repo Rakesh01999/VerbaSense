@@ -1,0 +1,54 @@
+
+---
+
+## 📌 Company Overview
+- **Name:** Unicorn Software & Solutions Ltd (USSBD)  
+- **Industry:** IT Services & Consulting, Custom Software Development  
+- **Founded:** 2005  
+- **Company Size:** 11–50 employees  [LinkedIn Kenya](https://ke.linkedin.com/company/unicorn-software-and-solutions)  
+- **Headquarters:**  
+  - Dhaka Office: 32, Flat-A3 (3rd Floor), Gareeb-e-newaz Road, Sector-11, Uttara, Dhaka  
+  - Khulna Office: 1st Floor, House #474, Road #24, Nirala R/A, Khulna  [ussbd.com](https://ussbd.com/)  
+- **Contact:**  
+  - Phone: **+880-1577-027037**  
+  - Email: **info@ussbd.com**  [ussbd.com](https://ussbd.com/)  
+- **Website:** [ussbd.com](https://ussbd.com)  
+
+---
+
+## 🚀 Services Offered
+- **Software Development:** Custom-built, high-performance, scalable solutions.  
+- **Web Development:** Responsive, optimized platforms for speed and accessibility.  
+- **App Development:** Cross-platform mobile and desktop applications.  
+- **UI/UX Design:** Human-centered, intuitive digital experiences.  
+- **Network Design:** Secure, enterprise-grade architectures.  
+- **Digital Marketing:** Data-driven strategies with analytics and automation  [ussbd.com](https://ussbd.com/).  
+
+---
+
+## 📊 Projects & Solutions
+USSBD has developed industry-specific software solutions, including:  
+- **Retail Store Management Software**  
+- **Educational Institute Management Systems**  
+- **E-commerce Platforms**  
+- **Smart Pharmacy Management Software**  
+- **Restaurant Management Systems**  
+- **Mobile Store & Footwear Store Management Software**  [ussbd.com](https://ussbd.com/)  
+
+---
+
+## 🌟 Key Highlights
+- **45+ Happy Clients** and **12 ongoing projects**.  
+- Emphasis on **quality services, creative design, free consultation, and customer support**.  
+- Focus on **future-ready technology** to help businesses compete globally  [ussbd.com](https://ussbd.com/).  
+
+---
+
+## ⚠️ Risks & Considerations
+- **Small company size (11–50 employees):** May limit capacity for very large enterprise projects.  
+- **Regional presence (Dhaka & Khulna):** Strong in Bangladesh but limited global footprint.  
+- **File format limitations:** Their Whisper-based demo tools (if used) require WAV/MP3/FLAC/OGG; unsupported formats like M4A need conversion.  
+
+---
+
+
