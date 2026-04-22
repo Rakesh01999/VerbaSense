@@ -1,6 +1,7 @@
-\documentclass{thesis-library}
+\documentclass[oneside]{thesis-library}
    
 \usepackage{lipsum}
+\usepackage{ragged2e}
 \setcode{utf8}
 
 % Abbreviations List
@@ -10,39 +11,71 @@
 \newacronym{api}{API}{Application Programming Interface}
 
 \begin{document}
-\newcommand{\thesisTitle}{VerbaSense: A Premium Speech-to-Text Platform}
-%\newcommand{\subtitle}{[ Thesis Subtitle ]}
-\newcommand{\byLabel}{Submitted By:}
-\newcommand{\studentID}{ID: 200112}
-\newcommand{\studentRegYear}{Registration Session: 2020-21}
-\newcommand{\studentAcaYear}{Academic Year: 2023-24}
-\newcommand{\studentName}{Rakesh Biswas}
-\newcommand{\supervisorLabel}{Supervisor:}
-\newcommand{\supervisorName}{Md. Harun Or Rashid}
-\newcommand{\supervisorDesig}{Senior Software Developer}
-\newcommand{\supervisorAff}{Unicorn Software \& Solutions Ltd}
-\newcommand{\coSupervisorLabel}{Co-Supervisor:}
-\newcommand{\coSupervisorName}{[Co-supervisor Name]}
-\newcommand{\cosupervisorDesig}{[Co-supervisor Designation]}
-\newcommand{\cosupervisorAff}{[Co-supervisor Affiliation]}
-\newcommand{\degreeLineALabel}{This internship report was submitted in partial fulfillment of the}
-\newcommand{\degreeLineBLabel}{Requirements for the Internship Program}
-\newcommand{\majorName}{In \textbf{Computer Science and Engineering}}
-\newcommand{\facultyName}{Faculty of Engineering and Technology}
-\newcommand{\universityName}{Jashore University of Science and Technology}
-\newcommand{\regionName}{Jashore-7408, Bangladesh}
-\newcommand{\degreeyearName}{2026}
-\newcommand{\degreemonthName}{April}
-\newcommand{\approvalText}{This internship report titled \textbf{``VerbaSense: A Premium Speech-to-Text Platform''} submitted by \textbf{Rakesh Biswas} has been accepted as satisfactory in partial fulfillment of the requirement for the internship program.}
-\newcommand{\studentSign}{\underline{Signature of the Student}}
 
-\newcommand{\supervisorSign}{\underline{Signature of the Supervisor}}
+% --- Exact BdREN Style Title Page ---
+\begin{titlepage}
+    \newgeometry{left=2cm,right=2cm,top=1.5cm,bottom=1.5cm}
+    \centering
+    \vspace*{0.5cm}
+    {\Large \textbf{Jashore University of Science and Technology} \par}
+    {\large Jashore-7408, Bangladesh \par}
+    \vspace{1.5cm}
+    
+    {\Large \textbf{Report on Internship} \par}
+    {\Large \textbf{at Unicorn Software \& Solutions Ltd (USSBD)} \par}
+    \vspace{1cm}
+    
+    \includegraphics[width=3cm]{images/JUST_logo_transparent.png} \par
+    \vspace{1cm}
+    
+    {\large \textbf{Submitted By:} \par}
+    {\large Rakesh Biswas \par}
+    {\large Student ID: 200112 \par}
+    {\large Session: 2020-21 \par}
+    \vspace{1.5cm}
+    
+    {\large \textbf{Submitted To:} \par}
+    {\large Exam Committee \par}
+    {\large Department of Computer Science and Engineering \par}
+    {\large Jashore University of Science and Technology \par}
+    
+    \vfill
+    \par\noindent\rule{\textwidth}{0.5pt} \par
+    {\large \textbf{April 25, 2026} \par}
+    \restoregeometry
+\end{titlepage}
 
-\newcommand{\cosupervisorSign}{\underline{Signature of the Co-Supervisor}}
-
-\makecoverpage
-
-\makeapprovalpage
+% --- Internship Certificate (Second Page) ---
+\begin{titlepage}
+    \centering
+    {\Large \textbf{Jashore University of Science and Technology} \par}
+    {\large Jashore-7408, Bangladesh \par}
+    \vspace{1cm}
+    
+    \includegraphics[width=3cm]{images/JUST_logo_transparent.png} \par
+    \vspace{1.5cm}
+    
+    \begin{onehalfspacing}
+    \noindent \justify This is to certify that \textbf{Rakesh Biswas (ID: 200112)}, a student of the Department of Computer Science and Engineering, Jashore University of Science and Technology, \textbf{Registration Session: 2020--21}, has completed an internship at \textbf{Unicorn Software and Solutions, Khulna Branch} from \textbf{15 January 2026 to 15 April 2026}. During this period, the intern was assigned to various development tasks at the Khulna office and was involved in practical work related to backend and full-stack development. The intern reported to \textbf{Mr. Md. Harun Or Rashid, Senior Software Developer}, who supervised his role and responsibilities. We found him to be \textbf{sincere, punctual and eager to learn}. \par
+    \end{onehalfspacing}
+    
+    \vfill
+    
+    \begin{center}
+    \begin{minipage}[t]{0.6\textwidth}
+        \centering
+        \par\noindent\rule{\textwidth}{0.5pt} \\
+        \textbf{Signature of the Student} \\
+        \vspace{1.5cm}
+        \par\noindent\rule{\textwidth}{0.5pt} \\
+        \textbf{Signature of the Supervisor} \\
+        Md. Harun Or Rashid \\
+        Senior Software Developer \\
+        Unicorn Software and Solution
+    \end{minipage}
+    \end{center}
+    \vspace*{3cm} % Space at the bottom
+\end{titlepage}
 
 \pagenumbering{roman}
 
@@ -52,19 +85,17 @@ I dedicate this work to my parents for their endless love, support, and encourag
 
 \chapter*{Acknowledgments}
 \addcontentsline{toc}{chapter}{Acknowledgments}
-I would like to express my sincere gratitude to \textbf{\Gls{ussbd}} for providing me with the opportunity to work as an intern. I am deeply thankful to my supervisor for their continuous guidance and support throughout the development of the \textbf{VerbaSense} project. 
+I am very grateful to \textbf{God} above all for granting me the strength, patience, and determination to finish this internship. I extend my heartfelt thanks to my supervisor, \textbf{Md. Harun Or Rashid}, Senior Software Developer at \Gls{ussbd}, for his continuous guidance and support throughout the development of the \textbf{VerbaSense} project.
 
-Special thanks to the entire development team at \Gls{ussbd} for their collaborative environment and for sharing their technical expertise, which was instrumental in the success of this project.
+I am also thankful to the faculty members of the \textbf{Department of Computer Science and Engineering, Jashore University of Science and Technology}, for their academic support. I am forever grateful to my parents and family for their endless love, sacrifices, and moral encouragement without which this venture would not have been feasible.
 
 \newpage
 \listofabbreviations
 
 \tableofcontents
 
-\newpage
 \listoffigures
 
-\newpage
 \listoftables
 
 \chapter*{Abstract}
@@ -76,36 +107,21 @@ The project was built using a modern full-stack architecture, including Next.js 
 \newpage
 \pagenumbering{arabic}
 
+% --- Chapter One ---
 \printchaptertitle{Introduction}
-\newpage
-
-\section{Background}
-In the modern digital era, the demand for accurate and efficient transcription services has increased significantly across various industries. VerbaSense was conceptualized to address the need for a secure, localized \Gls{stt} solution that minimizes dependency on expensive cloud \Gls{api}s while maintaining high transcription quality \cite{whisper}.
-
-\section{Objectives}
-The primary objectives of the VerbaSense project are:
-\begin{itemize}
-    \item To develop a robust web application for audio transcription using Next.js \cite{nextjs}.
-    \item To integrate the Whisper engine for local speech processing.
-    \item To ensure data security and user privacy through local hosting and \Gls{jwt} authentication.
-    \item To provide a premium user experience with modern UI/UX design.
-\end{itemize}
-
-\section{Scope}
-The scope of this project includes the development of a React-based frontend, a secure RESTful \Gls{api} using Express \cite{express}, database management for transcription history using MongoDB \cite{mongodb}, and the optimization of audio processing pipelines using FFmpeg \cite{ffmpeg}.
-
-\printchaptertitle{Company Profile}
-\section{Unicorn Software \& Solutions Ltd (USSBD)}
+\section{Organizational Profile (USSBD)}
 Founded in 2005, Unicorn Software \& Solutions Ltd (\Gls{ussbd}) is a leading IT services and consulting firm in Bangladesh. With offices in Dhaka and Khulna, \Gls{ussbd} specializes in custom software development, web applications, and network design. During my internship, I was based at the Khulna branch located at Nirala R/A.
 
-\section{Services Offered}
+\section{Mission and Vision}
+The mission of \Gls{ussbd} is to provide innovative, high-quality, and cost-effective software solutions that help businesses compete in the global market. The vision is to become a premier technology partner by delivering excellence in digital transformation.
+
+\section{Core Services}
 \Gls{ussbd} provides a wide range of services, including:
 \begin{itemize}
     \item Custom Software \& Web Development
     \item Mobile \& Desktop App Development
     \item UI/UX Design \& Human-Centered Interaction
     \item Network Architecture and Security
-    \item Digital Marketing \& Analytics
 \end{itemize}
 
 \section{Projects \& Solutions}
@@ -119,64 +135,76 @@ USSBD has developed industry-specific software solutions, including:
     \item Mobile Store \& Footwear Store Management Software
 \end{itemize}
 
-\printchaptertitle{Methodology}
+% --- Chapter Two ---
+\printchaptertitle{Internship Experience}
+\section{Introduction to Internship}
+My internship at \Gls{ussbd} was focused on full-stack web development and the integration of AI-driven tools into modern web applications. This experience allowed me to apply my theoretical knowledge to real-world industrial projects.
 
-\section{System Architecture}
+\section{Objectives of the Internship}
+The primary objectives were:
+\begin{itemize}
+    \item To gain hands-on experience in production-grade software development.
+    \item To understand the professional workflow and collaboration in an IT firm.
+    \item To master the integration of specialized engines like OpenAI Whisper.
+\end{itemize}
+
+\section{Roles and Responsibilities}
+As an intern, my responsibilities included:
+\begin{itemize}
+    \item Designing and implementing the frontend for VerbaSense.
+    \item Developing RESTful \Gls{api} endpoints for audio processing.
+    \item Ensuring data security through \Gls{jwt} and secure backend logic.
+\end{itemize}
+
+% --- Chapter Three ---
+\printchaptertitle{Technical Projects and Assignments}
+\section{Internship Goals and Deliverables}
+The main goal was the completion of the VerbaSense \Gls{stt} platform, ensuring it was ready for local deployment and testing.
+
+\section{VerbaSense: System Architecture}
 VerbaSense follows a decoupled client-server architecture. The frontend communicates with the backend via a REST \Gls{api}, and the backend interacts with the Whisper engine and MongoDB database.
 
-\section{Technology Stack}
+\section{Technology Stack Implementation}
 \begin{itemize}
-    \item \textbf{Frontend:} Next.js 14 (App Router), Tailwind CSS, Framer Motion.
-    \item \textbf{Backend:} Node.js, Express.js.
-    \item \textbf{Transcription Engine:} OpenAI Whisper (C++ CLI Implementation).
-    \item \textbf{Audio Processing:} FFmpeg.
-    \item \textbf{Database:} MongoDB (Mongoose ODM).
-    \item \textbf{Authentication:} JSON Web Tokens (\Gls{jwt}).
+    \item \textbf{Frontend:} Next.js 14 (App Router).
+    \item \textbf{Backend:} Node.js/Express.js.
+    \item \textbf{Engine:} OpenAI Whisper.
+    \item \textbf{Database:} MongoDB.
 \end{itemize}
 
-\section{Development Workflow}
-The project followed an Agile methodology, with iterative development cycles. We used Git for version control and focused on modular code structure to ensure scalability and maintainability.
+\section{Development Workflow and FFmpeg Integration}
+We utilized FFmpeg for automated audio format normalization, ensuring that all user-uploaded files were converted to a standard format compatible with the Whisper engine.
 
-\printchaptertitle{Implementation}
+% --- Chapter Four ---
+\printchaptertitle{Technical Challenges and Solutions}
+\section{Audio Processing Hurdles}
+One of the main challenges was handling large audio files and ensuring low-latency transcription. This was solved by optimizing the Whisper C++ CLI implementation and utilizing efficient file streaming.
 
-\section{Core Features}
+\section{Security and JWT Implementation}
+Implementing a secure authentication layer required careful handling of tokens and user sessions. We utilized \Gls{jwt} for stateless authentication, ensuring that transcription history remains private to each user.
+
+% --- Chapter Five ---
+\printchaptertitle{Professional Development}
+\section{Skills Gained and Learning Outcomes}
+Through this internship, I gained significant expertise in full-stack development, particularly with the Next.js framework and Express.js backend.
+
+\section{Technical Skills Acquired}
 \begin{itemize}
-    \item \textbf{Secure Transcription:} High-accuracy conversion using the Whisper medium model.
-    \item \textbf{Interactive Dashboard:} Real-time status updates and visualizations.
-    \item \textbf{History Management:} Users can view, search, and delete past transcriptions.
-    \item \textbf{Format Normalization:} Automated conversion of various audio formats (WAV, MP3, FLAC) using FFmpeg.
+    \item Proficiency in Next.js App Router and Server Components.
+    \item Experience in building and securing REST \Gls{api}s.
+    \item Knowledge of AI model deployment and CLI integration.
 \end{itemize}
 
-\section{UI/UX Design}
-The user interface was built with a ``premium'' aesthetic in mind, utilizing Shadcn/ui components and smooth animations provided by Framer Motion. The layout is fully responsive, ensuring a seamless experience across devices.
+\section{Professional and Soft Skills}
+I also improved my skills in team collaboration, time management, and technical documentation.
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics[width=0.4\textwidth]{verbasense_logo.png}
-  \caption{VerbaSense Project Branding}
-  \label{fig:logo}
-\end{figure}
+% --- Chapter Six ---
+\printchaptertitle{Self Assessment}
+I believe this internship has been highly productive. I successfully delivered the VerbaSense project and received positive feedback from my supervisor. My ability to troubleshoot complex issues and learn new technologies independently has improved significantly.
 
-\printchaptertitle{Results and Discussion}
-
-\section{Performance Evaluation}
-VerbaSense demonstrated significant efficiency in processing audio files locally. The use of the Whisper C++ implementation allowed for near real-time transcription on standard server hardware without the need for external cloud costs.
-
-\section{Transcription Accuracy}
-Testing against various accents and audio qualities showed that the Whisper medium model provides an Word Error Rate (WER) comparable to industry leaders, particularly for clear English and technical terminology.
-
+% --- Chapter Seven ---
 \printchaptertitle{Conclusion}
-
-\section{Summary}
 The development of VerbaSense successfully met the objective of creating a professional, secure, and accurate Speech-to-Text platform. The integration of cutting-edge technologies like Whisper and Next.js 14 ensured a high-quality product suitable for enterprise use.
-
-\section{Recommendations}
-For future enhancements, we recommend:
-\begin{itemize}
-    \item Implementing multi-language support (Whisper supports 99 languages).
-    \item Adding real-time streaming transcription via WebSockets.
-    \item Enhancing the speaker diarization feature to identify multiple speakers.
-\end{itemize}
 
 \renewcommand{\bibname}{References}
 \bibliographystyle{plain}
