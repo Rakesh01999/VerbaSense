@@ -52,3 +52,54 @@ USSBD has developed industry-specific software solutions, including:
 ---
 
 
+==========================================================================================
+==========================================================================================
+
+
+
+
+
+Supervisor Information :
+
+Intern information
+
+
+My academic details along with the information of my company. 
+This information is mandatory for the evaluation of your internship.
+
+My Email:rbiswas01999@gmail.com 
+ 
+Email
+Registration session 	:2020-21
+
+Student ID		:200112
+
+Student Name		:Rakesh Biswas
+
+Provide the name of the company where you are completing your internship.
+=Unicorn Software And Solution. Khulna Branch
+
+Provide the official website link of the company.
+=http://ussbd.com/
+
+Provide the physical address of the company.
+=Khulna Office: 1st Floor, House# 474, Road# 24 Nirala R/A, Khulna
+
+
+about the person who is responsible for supervising me in the company regarding my role and responsibilities
+Company Supervisor's Name
+=Md. Harun Or Rashid
+
+Company Supervisor's Designation
+=Senior Software Developer
+
+Company Supervisor's Email
+=rashid2k22@gmail.com
+
+Company Supervisor's official phone number
+=01723538635
+
+
+
+
+

@@ -1,0 +1,185 @@
+\documentclass{thesis-library}
+   
+\usepackage{lipsum}
+\setcode{utf8}
+
+% Abbreviations List
+\newacronym{stt}{STT}{Speech-to-Text}
+\newacronym{jwt}{JWT}{JSON Web Token}
+\newacronym{ussbd}{USSBD}{Unicorn Software \& Solutions Ltd}
+\newacronym{api}{API}{Application Programming Interface}
+
+\begin{document}
+\newcommand{\thesisTitle}{VerbaSense: A Premium Speech-to-Text Platform}
+%\newcommand{\subtitle}{[ Thesis Subtitle ]}
+\newcommand{\byLabel}{Submitted By:}
+\newcommand{\studentID}{ID: 200112}
+\newcommand{\studentRegYear}{Registration Session: 2020-21}
+\newcommand{\studentAcaYear}{Academic Year: 2023-24}
+\newcommand{\studentName}{Rakesh Biswas}
+\newcommand{\supervisorLabel}{Supervisor:}
+\newcommand{\supervisorName}{Md. Harun Or Rashid}
+\newcommand{\supervisorDesig}{Senior Software Developer}
+\newcommand{\supervisorAff}{Unicorn Software \& Solutions Ltd}
+\newcommand{\coSupervisorLabel}{Co-Supervisor:}
+\newcommand{\coSupervisorName}{[Co-supervisor Name]}
+\newcommand{\cosupervisorDesig}{[Co-supervisor Designation]}
+\newcommand{\cosupervisorAff}{[Co-supervisor Affiliation]}
+\newcommand{\degreeLineALabel}{This internship report was submitted in partial fulfillment of the}
+\newcommand{\degreeLineBLabel}{Requirements for the Internship Program}
+\newcommand{\majorName}{In \textbf{Computer Science and Engineering}}
+\newcommand{\facultyName}{Faculty of Engineering and Technology}
+\newcommand{\universityName}{Jashore University of Science and Technology}
+\newcommand{\regionName}{Jashore-7408, Bangladesh}
+\newcommand{\degreeyearName}{2026}
+\newcommand{\degreemonthName}{April}
+\newcommand{\approvalText}{This internship report titled \textbf{``VerbaSense: A Premium Speech-to-Text Platform''} submitted by \textbf{Rakesh Biswas} has been accepted as satisfactory in partial fulfillment of the requirement for the internship program.}
+\newcommand{\studentSign}{\underline{Signature of the Student}}
+
+\newcommand{\supervisorSign}{\underline{Signature of the Supervisor}}
+
+\newcommand{\cosupervisorSign}{\underline{Signature of the Co-Supervisor}}
+
+\makecoverpage
+
+\makeapprovalpage
+
+\pagenumbering{roman}
+
+\chapter*{Dedication}
+\addcontentsline{toc}{chapter}{Dedication}
+I dedicate this work to my parents for their endless love, support, and encouragement throughout my academic journey and internship.
+
+\chapter*{Acknowledgments}
+\addcontentsline{toc}{chapter}{Acknowledgments}
+I would like to express my sincere gratitude to \textbf{\Gls{ussbd}} for providing me with the opportunity to work as an intern. I am deeply thankful to my supervisor for their continuous guidance and support throughout the development of the \textbf{VerbaSense} project. 
+
+Special thanks to the entire development team at \Gls{ussbd} for their collaborative environment and for sharing their technical expertise, which was instrumental in the success of this project.
+
+\newpage
+\listofabbreviations
+
+\tableofcontents
+
+\newpage
+\listoffigures
+
+\newpage
+\listoftables
+
+\chapter*{Abstract}
+\addcontentsline{toc}{chapter}{Abstract}
+This report details the design and development of \textbf{VerbaSense}, a high-performance \Gls{stt} application developed during my internship at \Gls{ussbd}. VerbaSense leverages the OpenAI Whisper engine to provide secure, local, and accurate audio transcriptions. 
+
+The project was built using a modern full-stack architecture, including Next.js 14 for the frontend and Node.js/Express for the backend. Key features include real-time transcription, history management, and secure \Gls{jwt}-based authentication. This report covers the methodology, system architecture, implementation details, and evaluation of the platform.
+
+\newpage
+\pagenumbering{arabic}
+
+\printchaptertitle{Introduction}
+\newpage
+
+\section{Background}
+In the modern digital era, the demand for accurate and efficient transcription services has increased significantly across various industries. VerbaSense was conceptualized to address the need for a secure, localized \Gls{stt} solution that minimizes dependency on expensive cloud \Gls{api}s while maintaining high transcription quality \cite{whisper}.
+
+\section{Objectives}
+The primary objectives of the VerbaSense project are:
+\begin{itemize}
+    \item To develop a robust web application for audio transcription using Next.js \cite{nextjs}.
+    \item To integrate the Whisper engine for local speech processing.
+    \item To ensure data security and user privacy through local hosting and \Gls{jwt} authentication.
+    \item To provide a premium user experience with modern UI/UX design.
+\end{itemize}
+
+\section{Scope}
+The scope of this project includes the development of a React-based frontend, a secure RESTful \Gls{api} using Express \cite{express}, database management for transcription history using MongoDB \cite{mongodb}, and the optimization of audio processing pipelines using FFmpeg \cite{ffmpeg}.
+
+\printchaptertitle{Company Profile}
+\section{Unicorn Software \& Solutions Ltd (USSBD)}
+Founded in 2005, Unicorn Software \& Solutions Ltd (\Gls{ussbd}) is a leading IT services and consulting firm in Bangladesh. With offices in Dhaka and Khulna, \Gls{ussbd} specializes in custom software development, web applications, and network design. During my internship, I was based at the Khulna branch located at Nirala R/A.
+
+\section{Services Offered}
+\Gls{ussbd} provides a wide range of services, including:
+\begin{itemize}
+    \item Custom Software \& Web Development
+    \item Mobile \& Desktop App Development
+    \item UI/UX Design \& Human-Centered Interaction
+    \item Network Architecture and Security
+    \item Digital Marketing \& Analytics
+\end{itemize}
+
+\section{Projects \& Solutions}
+USSBD has developed industry-specific software solutions, including:
+\begin{itemize}
+    \item Retail Store Management Software
+    \item Educational Institute Management Systems
+    \item E-commerce Platforms
+    \item Smart Pharmacy Management Software
+    \item Restaurant Management Systems
+    \item Mobile Store \& Footwear Store Management Software
+\end{itemize}
+
+\printchaptertitle{Methodology}
+
+\section{System Architecture}
+VerbaSense follows a decoupled client-server architecture. The frontend communicates with the backend via a REST \Gls{api}, and the backend interacts with the Whisper engine and MongoDB database.
+
+\section{Technology Stack}
+\begin{itemize}
+    \item \textbf{Frontend:} Next.js 14 (App Router), Tailwind CSS, Framer Motion.
+    \item \textbf{Backend:} Node.js, Express.js.
+    \item \textbf{Transcription Engine:} OpenAI Whisper (C++ CLI Implementation).
+    \item \textbf{Audio Processing:} FFmpeg.
+    \item \textbf{Database:} MongoDB (Mongoose ODM).
+    \item \textbf{Authentication:} JSON Web Tokens (\Gls{jwt}).
+\end{itemize}
+
+\section{Development Workflow}
+The project followed an Agile methodology, with iterative development cycles. We used Git for version control and focused on modular code structure to ensure scalability and maintainability.
+
+\printchaptertitle{Implementation}
+
+\section{Core Features}
+\begin{itemize}
+    \item \textbf{Secure Transcription:} High-accuracy conversion using the Whisper medium model.
+    \item \textbf{Interactive Dashboard:} Real-time status updates and visualizations.
+    \item \textbf{History Management:} Users can view, search, and delete past transcriptions.
+    \item \textbf{Format Normalization:} Automated conversion of various audio formats (WAV, MP3, FLAC) using FFmpeg.
+\end{itemize}
+
+\section{UI/UX Design}
+The user interface was built with a ``premium'' aesthetic in mind, utilizing Shadcn/ui components and smooth animations provided by Framer Motion. The layout is fully responsive, ensuring a seamless experience across devices.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics[width=0.4\textwidth]{verbasense_logo.png}
+  \caption{VerbaSense Project Branding}
+  \label{fig:logo}
+\end{figure}
+
+\printchaptertitle{Results and Discussion}
+
+\section{Performance Evaluation}
+VerbaSense demonstrated significant efficiency in processing audio files locally. The use of the Whisper C++ implementation allowed for near real-time transcription on standard server hardware without the need for external cloud costs.
+
+\section{Transcription Accuracy}
+Testing against various accents and audio qualities showed that the Whisper medium model provides an Word Error Rate (WER) comparable to industry leaders, particularly for clear English and technical terminology.
+
+\printchaptertitle{Conclusion}
+
+\section{Summary}
+The development of VerbaSense successfully met the objective of creating a professional, secure, and accurate Speech-to-Text platform. The integration of cutting-edge technologies like Whisper and Next.js 14 ensured a high-quality product suitable for enterprise use.
+
+\section{Recommendations}
+For future enhancements, we recommend:
+\begin{itemize}
+    \item Implementing multi-language support (Whisper supports 99 languages).
+    \item Adding real-time streaming transcription via WebSockets.
+    \item Enhancing the speaker diarization feature to identify multiple speakers.
+\end{itemize}
+
+\renewcommand{\bibname}{References}
+\bibliographystyle{plain}
+\bibliography{references.bib}
+
+\end{document}
