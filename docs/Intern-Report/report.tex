@@ -255,45 +255,70 @@ Throughout the course of this internship, maintaining a strong and consistent wo
 In summary, the internship structure at \Gls{ussbd} provided a perfectly balanced mix of theoretical research and high-pressure implementation. By working through these rigorous modules and adhering to a professional work ethic, I was able to prepare myself for the technical challenges detailed in the following chapters. This experience has not only improved my technical proficiency but has also shaped my understanding of what it means to be a professional software engineer in the modern era.
 
 % --- Chapter Three ---
-\printchaptertitle{My Involvement in Project Work}
+\printchaptertitle{My Involvement in Office Work}
 \section{Internship Goals and Deliverables}
-The main goal was the completion of the VerbaSense \Gls{stt} platform, ensuring it was ready for local deployment and testing.
+The primary objective of my internship at \Gls{ussbd} was the end-to-end development of the \textbf{VerbaSense} Speech-to-Text platform. This involved not only the technical implementation of the software but also the research and selection of the most efficient AI engines for local execution. The key deliverables defined at the beginning of my tenure included:
+\begin{itemize}
+    \item A high-performance, responsive frontend built with Next.js 14 and Tailwind CSS.
+    \item A secure, stateless backend API architecture using Node.js and Express.
+    \item Integration of a locally-hosted OpenAI Whisper engine for private transcription.
+    \item Implementation of a robust authentication and history management system.
+    \item Comprehensive technical documentation and a version-controlled codebase.
+\end{itemize}
 
-\section{VerbaSense Architecture – System Core}
-\subsection{Frontend Infrastructure Overview}
-The system leverages a modern stack consisting of Next.js, Express, and MongoDB, with the transcription engine decoupled from the main web server.
-\subsection{Backend and Audio Processing Engine}
-The backend handles audio file ingestion and interfaces with the Whisper C++ implementation for efficient processing.
-\subsection{Data Flow and System Integration}
-Transcription history and user metadata are managed through MongoDB, ensuring persistent storage and fast retrieval.
-\subsection{User Authentication and Monitoring}
-RESTful endpoints were designed for file upload status tracking and transcription result polling.
+\section{USSBD Development Hub – Khulna Branch}
+The majority of my office work was conducted at the USSBD Khulna branch, which serves as the organization's primary research and development center for AI and web technologies.
 
-\section{USSBD Development Workflow}
-\subsection{Introduction to Agile Development}
-Learned the importance of daily stand-ups and iterative development in a professional environment.
-\subsection{Version Control and Collaborative Coding}
-Used Git for branch management and collaborative development on GitHub.
-\subsection{API Documentation and Testing}
-Conducted rigorous testing of RESTful APIs using Postman.
+\subsection{Physical Infrastructure Overview}
+The physical infrastructure at the Khulna branch is designed to support high-intensity software development. My workstation was equipped with high-performance computing hardware, including multi-core processors and specialized GPUs required for local AI inference. The ergonomic layout of the development floor allowed for seamless collaboration between teams, which was essential for the rapid prototyping phases of the VerbaSense project.
 
-\section{Technical Tasks and Implementation}
-\subsection{Audio Processing with FFmpeg}
-Essential for pre-processing various audio formats into the required mono 16kHz WAV format.
-\subsection{Model Deployment with OpenAI Whisper}
-The primary engine used for converting audio to high-accuracy text transcripts.
-\subsection{Additional Development Activities}
-Assisted in UI/UX refinements and database schema optimizations.
+\subsection{Server Configuration and Resource Management}
+Working with AI models requires significant system resources. I spent time understanding the local server configurations, particularly how the CPU and RAM are allocated during high-load transcription tasks. Managing these resources effectively was crucial to ensure that the server remained responsive while running the Whisper engine in the background.
+
+\subsection{Development Network and Secure Access}
+The development network was segmented to provide secure access to internal staging servers and database instances. I learned to navigate this secure environment, ensuring that all data transfers—especially user-uploaded audio files—remained encrypted and isolated within the local network to maintain user privacy.
+
+\subsection{Agile Workflow and Task Management}
+USSBD utilizes an Agile-based workflow for project management. I actively participated in daily stand-ups and used internal task-tracking tools to manage my progress. This disciplined approach taught me how to break down complex project requirements into manageable sprints, ensuring that every feature of the platform was delivered on schedule.
+
+\section{Project Implementation Core}
+This section details the specific engineering steps taken to build the core transcription engine of the VerbaSense platform.
+
+\subsection{Introduction to Local AI Transcription Engines}
+One of my first tasks was researching various open-source AI engines. I focused on the OpenAI Whisper engine due to its superior accuracy and ability to run locally. Understanding the model's architecture was essential for its successful integration into our Node.js-based backend.
+
+\subsection{Audio Processing and Normalization Setup}
+Before transcription could occur, the audio data needed to be sanitized. I implemented a robust pre-processing workflow using \textbf{FFmpeg}. This involved normalizing volume levels and converting various formats into the specific 16kHz mono WAV format required by the engine, which significantly improved transcription accuracy.
+
+\subsection{API Layer and Backend CLI Integration}
+I developed the bridge between the web server and the AI engine. Since the Whisper engine runs as a standalone C++ application, I implemented a Node.js child process manager to trigger transcriptions and capture the output in real-time, which was then streamed back to the frontend.
+
+\section{Technical Simulation and Development Labs}
+To ensure the system's reliability, I conducted several technical "labs" to test different deployment scenarios.
+
+\subsection{Single-Threaded vs Multi-Threaded Inference}
+In this lab, I benchmarked the performance of the transcription engine under different CPU threading configurations. I discovered that while multi-threading increases speed, it also consumes more system resources, leading to a trade-off that needed to be balanced for local deployment.
+
+\subsection{Batch Processing Optimization Labs}
+I experimented with batching multiple audio files for transcription. This involved managing a queue system in the backend to ensure that files were processed sequentially without overloading the system memory, a critical feature for handling high-traffic scenarios.
+
+\subsection{Additional Integration Activities}
+Beyond the core engine, I assisted in integrating the transcription history with the MongoDB database. This involved designing flexible NoSQL schemas that could store both the raw text transcripts and the associated metadata (timestamps, file sizes, etc.).
 
 \section{Tools and Technologies Used}
-\subsection{Visual Studio Code (IDE)}
-Used as the primary environment for coding and debugging.
-\subsection{Postman (API Testing)}
-Comprehensive API tests were performed to ensure all edge cases in file uploading were handled.
-\subsection{GitHub (Version Control)}
-Used for version control and collaborating with other developers.
-\subsection{MongoDB Compass (Database Management)}
-Used for visualizing and managing the transcription database.
+The following industry-standard tools were essential to the development process:
+
+\subsection{Visual Studio Code (Professional IDE)}
+VS Code served as my primary development environment. I utilized its integrated terminal and debugging tools to manage both the frontend and backend servers simultaneously, which greatly improved my productivity.
+
+\subsection{Postman (REST API Validation)}
+I used Postman to validate every API endpoint I created. By building automated test suites, I could ensure that the authentication and file upload layers were functioning correctly after every code change.
+
+\subsection{GitHub (Distributed Version Control)}
+GitHub was used for managing the project's source code. I learned to manage feature branches and merge requests effectively, ensuring a clean and transparent development history for the entire project.
+
+\subsection{MongoDB Compass (NoSQL Visualization)}
+MongoDB Compass allowed me to visually manage the data stored in our database. It was particularly useful for debugging schema issues and verifying that transcription data was being persisted correctly.
 
 % --- Chapter Four ---
 \printchaptertitle{Technical Challenges and Solutions}
