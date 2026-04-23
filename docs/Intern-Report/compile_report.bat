@@ -4,8 +4,9 @@ echo Compiling VerbaSense Internship Report...
 :: First pass to generate aux files
 pdflatex -interaction=nonstopmode report.tex
 
-:: Process bibliography
+:: Process bibliography and glossaries
 bibtex report
+makeglossaries report
 
 :: Second pass to include citations
 pdflatex -interaction=nonstopmode report.tex

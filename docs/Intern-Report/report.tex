@@ -2,13 +2,43 @@
    
 \usepackage{lipsum}
 \usepackage{ragged2e}
+\usepackage{tocloft}
+\usepackage{fmtcount}
 \setcode{utf8}
+
+% TOC Customization
+\makeatletter
+\setlength{\cftbeforetoctitleskip}{-2.5cm} % Aggressively reduce top space
+\renewcommand{\cfttoctitlefont}{\hfill\Huge\bfseries}
+\renewcommand{\cftaftertoctitle}{\hfill\null}
+\renewcommand{\cftloftitlefont}{\hfill\Huge\bfseries}
+\renewcommand{\cftafterloftitle}{\hfill\null}
+\renewcommand{\cftlottitlefont}{\hfill\Huge\bfseries}
+\renewcommand{\cftafterlottitle}{\hfill\null}
+% Chapter entries: Bold, No dots
+\renewcommand{\cftchapfont}{\bfseries}
+\renewcommand{\cftchappagefont}{\bfseries}
+\renewcommand{\cftchapleader}{\hfill}
+\setlength{\cftchapnumwidth}{0pt} 
+% Section entries: Normal font, Dots, Indented
+\renewcommand{\cftsecfont}{\normalfont}
+\renewcommand{\cftsecpagefont}{\normalfont}
+\renewcommand{\cftsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftsecindent}{0.5cm}
+% Subsection entries: Normal font, Dots, More Indented
+\renewcommand{\cftsubsecfont}{\normalfont}
+\renewcommand{\cftsubsecpagefont}{\normalfont}
+\renewcommand{\cftsubsecleader}{\cftdotfill{\cftdotsep}}
+\setlength{\cftsubsecindent}{1.2cm}
+\makeatother
 
 % Abbreviations List
 \newacronym{stt}{STT}{Speech-to-Text}
 \newacronym{jwt}{JWT}{JSON Web Token}
 \newacronym{ussbd}{USSBD}{Unicorn Software \& Solutions Ltd}
 \newacronym{api}{API}{Application Programming Interface}
+
+\let\cleardoublepage\clearpage
 
 \begin{document}
 
@@ -77,10 +107,32 @@
     \vspace*{3cm} % Space at the bottom
 \end{titlepage}
 
+% Redefine \printchaptertitle to use written-out numbers (BdREN Style)
+\makeatletter
+\renewcommand{\printchaptertitle}[1]{
+  \clearpage
+  \pagestyle{empty}
+  \refstepcounter{chapter}
+  \edef\currentchapternumber{\Numberstring{chapter}}
+  \edef\currentchaptertitle{Chapter \Numberstring{chapter}: #1}
+  \vspace*{\fill}
+  \begin{center}
+    {\huge \textbf{Chapter \Numberstring{chapter}}} \\[2.5ex]
+    {\Huge \textbf{#1}}
+  \end{center}
+  \vspace*{\fill}
+  \clearpage
+  \thispagestyle{firstcontentpage}
+  \addcontentsline{toc}{chapter}{Chapter \Numberstring{chapter}: #1}
+  \pagestyle{fancy}
+  \fancyhf{}
+  \fancyfoot[C]{Page \thepage \hspace{1pt} of \pageref{LastPage}}
+}
+\makeatother
+
 \pagenumbering{roman}
 
 \chapter*{Dedication}
-\addcontentsline{toc}{chapter}{Dedication}
 I dedicate this work to my parents for their endless love, support, and encouragement throughout my academic journey and internship.
 
 \chapter*{Acknowledgments}
@@ -89,14 +141,8 @@ I am very grateful to \textbf{God} above all for granting me the strength, patie
 
 I am also thankful to the faculty members of the \textbf{Department of Computer Science and Engineering, Jashore University of Science and Technology}, for their academic support. I am forever grateful to my parents and family for their endless love, sacrifices, and moral encouragement without which this venture would not have been feasible.
 
-\newpage
-\listofabbreviations
-
+\clearpage
 \tableofcontents
-
-\listoffigures
-
-\listoftables
 
 \chapter*{Abstract}
 \addcontentsline{toc}{chapter}{Abstract}
@@ -104,96 +150,132 @@ This report details the design and development of \textbf{VerbaSense}, a high-pe
 
 The project was built using a modern full-stack architecture, including Next.js 14 for the frontend and Node.js/Express for the backend. Key features include real-time transcription, history management, and secure \Gls{jwt}-based authentication. This report covers the methodology, system architecture, implementation details, and evaluation of the platform.
 
-\newpage
+\clearpage
 \pagenumbering{arabic}
 
 % --- Chapter One ---
 \printchaptertitle{Introduction}
-\section{Organizational Profile (USSBD)}
-Founded in 2005, Unicorn Software \& Solutions Ltd (\Gls{ussbd}) is a leading IT services and consulting firm in Bangladesh. With offices in Dhaka and Khulna, \Gls{ussbd} specializes in custom software development, web applications, and network design. During my internship, I was based at the Khulna branch located at Nirala R/A.
+In the rapidly evolving landscape of Software Engineering and Artificial Intelligence (AI), theoretical mastery must be complemented by rigorous practical application to develop industry-standard solutions. As global industries undergo a massive digital shift, academic institutions are prioritizing internships to bridge the gap between classroom algorithms and production-ready deployments. For a Computer Science and Engineering student, an internship at a specialized software firm offers an unparalleled opportunity to understand the complexities of the Software Development Life Cycle (SDLC) and the nuances of integrating advanced AI engines into user-centric platforms.
 
-\section{Mission and Vision}
-The mission of \Gls{ussbd} is to provide innovative, high-quality, and cost-effective software solutions that help businesses compete in the global market. The vision is to become a premier technology partner by delivering excellence in digital transformation.
+This report provides a detailed reflection on my professional journey as a Software Engineering Intern at \textbf{Unicorn Software \& Solutions Ltd (USSBD)}. Since its inception in 2005, \Gls{ussbd} has been at the forefront of the local IT sector, specializing in custom enterprise applications and innovative web architectures. My tenure at the Khulna branch was centered on the development of \textbf{VerbaSense}---a high-performance Speech-to-Text (\Gls{stt}) application designed to bring the power of the OpenAI Whisper engine to a secure, locally-hosted environment.
 
-\section{Core Services}
-\Gls{ussbd} provides a wide range of services, including:
+The primary objective of this report is to analyze the technical architecture of VerbaSense, document the development methodologies employed, and evaluate the performance of the integrated AI models. Furthermore, it highlights the professional growth and technical proficiency gained during this tenure, providing a technical roadmap for building scalable AI-integrated web applications.
+
+\section{Organizational Overview: USSBD}
+Unicorn Software \& Solutions Ltd (\Gls{ussbd}) stands as a premier software development and IT consulting powerhouse headquartered in Bangladesh. Since its inception, the company has dedicated itself to transforming the digital landscape of the region by providing state-of-the-art software solutions that are both scalable and secure. With nearly two decades of operational excellence, \Gls{ussbd} has built a reputation for excellence in delivering high-performance applications that cater to a global clientele. The organization is driven by a team of highly skilled engineers, designers, and project managers who utilize modern development methodologies to solve complex industrial problems.
+
+\subsection{Historical Background and Formation}
+The genesis of \Gls{ussbd} dates back to 2005, a period when the digital economy of Bangladesh was in its nascent stages. The company was founded by a visionary group of IT professionals who recognized the critical need for a reliable technology partner that could deliver more than just basic web presence. Over the last twenty years, the company has undergone significant evolution, transitioning from a small development studio into a mature software house with a robust infrastructure. This journey has been marked by the successful delivery of over 45 high-impact projects, ranging from retail management systems to sophisticated AI-driven platforms. Today, \Gls{ussbd} is recognized as a key contributor to the nation's "Digital Bangladesh" vision, continuously pushing the boundaries of what is possible in the local IT sector.
+
+\subsection{Organizational Vision and Strategic Goals}
+The overarching vision of \Gls{ussbd} is to be the primary catalyst for digital transformation in the region, empowering organizations through intelligent and human-centered technology. The company's mission is rooted in the belief that software should not only be functional but should also provide a competitive edge to its users. To achieve this, \Gls{ussbd} has established several key strategic goals:
 \begin{itemize}
-    \item Custom Software \& Web Development
-    \item Mobile \& Desktop App Development
-    \item UI/UX Design \& Human-Centered Interaction
-    \item Network Architecture and Security
+    \item \textbf{AI-Driven Product Innovation:} The company is committed to the research and development of proprietary tools that integrate Large Language Models (LLMs) and advanced AI engines. By focusing on projects like \textbf{VerbaSense}, \Gls{ussbd} aims to make cutting-edge AI technology accessible and secure for enterprise use.
+    \item \textbf{Scalable Enterprise Architecture:} A core strategic focus is the design of software backbones that are built for growth. This involves utilizing microservices architectures, cloud-native deployments, and robust database management systems to ensure that products can scale seamlessly as client demands increase.
+    \item \textbf{Human-Centered Design (HCD):} \Gls{ussbd} prioritizes the end-user experience by adopting a design-first approach. This ensures that even the most complex backend functionalities are presented through intuitive and accessible user interfaces, reducing the learning curve for clients.
+    \item \textbf{Digital Readiness and Consulting:} Beyond development, the company aims to enhance the digital literacy and readiness of its clients by providing comprehensive IT consulting and support services.
 \end{itemize}
 
-\section{Projects \& Solutions}
-USSBD has developed industry-specific software solutions, including:
+\subsection{Core Services and Offerings}
+\Gls{ussbd} provides a comprehensive and diverse range of professional software services tailored to meet the needs of a global market:
 \begin{itemize}
-    \item Retail Store Management Software
-    \item Educational Institute Management Systems
-    \item E-commerce Platforms
-    \item Smart Pharmacy Management Software
-    \item Restaurant Management Systems
-    \item Mobile Store \& Footwear Store Management Software
+    \item \textbf{Custom Enterprise Solutions:} The company specializes in building tailored management systems, including ERP (Enterprise Resource Planning), CRM (Customer Relationship Management), and specialized retail management tools. These solutions are designed to automate core business processes and improve operational efficiency.
+    \item \textbf{Full-Stack Web Architectures:} Utilizing modern frameworks such as Next.js, React, and Node.js, \Gls{ussbd} develops high-performance web platforms that are optimized for SEO, accessibility, and speed. These architectures are designed to handle high concurrency and provide a smooth user experience.
+    \item \textbf{Mobile Ecosystems:} The development team is proficient in creating native and cross-platform mobile applications (Flutter, React Native) for both iOS and Android. These apps focus on providing a seamless transition from desktop to mobile for enterprise users.
+    \item \textbf{AI \& Machine Learning Integration:} A key differentiator for \Gls{ussbd} is its ability to integrate advanced AI models into existing software workflows. This includes Speech-to-Text, Natural Language Processing (NLP), and predictive analytics tools.
+    \item \textbf{Secure IT Infrastructure:} The company offers enterprise-grade network design and secure hosting solutions, ensuring that client data is protected through industry-standard encryption and security protocols.
 \end{itemize}
+
+\subsection{Geographic and Physical Presence}
+To maintain high levels of client engagement and service delivery, \Gls{ussbd} operates from two strategic development hubs in Bangladesh:
+\begin{itemize}
+    \item \textbf{Dhaka Headquarters:} Located in the heart of Uttara, this office serves as the administrative center and the primary hub for design and client relations. It is equipped with modern infrastructure to support a large-scale development workforce.
+    \item \textbf{Khulna Development Branch:} Located in Nirala R/A, Khulna, this branch is the core research and development center where much of the technical implementation and AI research takes place. My internship was conducted at this location, providing me with direct exposure to the core development team.
+\end{itemize}
+
+\subsection{International Linkages and Collaborations}
+USSBD is committed to maintaining international standards in software quality, documentation, and security. The company actively collaborates with global technology partners to stay abreast of emerging trends in the global IT sector. By adopting internationally recognized development standards (such as ISO guidelines for software quality), \Gls{ussbd} ensures that its products are globally competitive. This international perspective is reflected in the company's ability to serve a diverse range of clients across different continents, providing them with future-proof digital solutions.
 
 % --- Chapter Two ---
-\printchaptertitle{Internship Experience}
-\section{Introduction to Internship}
-My internship at \Gls{ussbd} was focused on full-stack web development and the integration of AI-driven tools into modern web applications. This experience allowed me to apply my theoretical knowledge to real-world industrial projects.
+\printchaptertitle{Internship Structure and Objectives}
+\section{Overview of the Internship Program}
+My internship at \Gls{ussbd} Khulna Branch was specifically designed to provide deep immersion into full-stack web development and AI engine integration. Under the supervision of \textbf{Mr. Md. Harun Or Rashid} (Senior Software Developer), I was involved in the development of real-world projects, specifically focusing on the VerbaSense \Gls{stt} platform.
 
-\section{Objectives of the Internship}
-The primary objectives were:
-\begin{itemize}
-    \item To gain hands-on experience in production-grade software development.
-    \item To understand the professional workflow and collaboration in an IT firm.
-    \item To master the integration of specialized engines like OpenAI Whisper.
-\end{itemize}
+\section{Specific Internship Modules}
+The program was divided into several modules, including frontend design, backend API development, and AI engine research.
 
-\section{Roles and Responsibilities}
-As an intern, my responsibilities included:
-\begin{itemize}
-    \item Designing and implementing the frontend for VerbaSense.
-    \item Developing RESTful \Gls{api} endpoints for audio processing.
-    \item Ensuring data security through \Gls{jwt} and secure backend logic.
-\end{itemize}
+\section{Work Ethic}
+Learned the importance of punctuality, professional communication, and agile development practices in a corporate environment.
 
 % --- Chapter Three ---
-\printchaptertitle{Technical Projects and Assignments}
+\printchaptertitle{My Involvement in Project Work}
 \section{Internship Goals and Deliverables}
 The main goal was the completion of the VerbaSense \Gls{stt} platform, ensuring it was ready for local deployment and testing.
 
-\section{VerbaSense: System Architecture}
-VerbaSense follows a decoupled client-server architecture. The frontend communicates with the backend via a REST \Gls{api}, and the backend interacts with the Whisper engine and MongoDB database.
+\section{VerbaSense Architecture – System Core}
+\subsection{Frontend Infrastructure Overview}
+The system leverages a modern stack consisting of Next.js, Express, and MongoDB, with the transcription engine decoupled from the main web server.
+\subsection{Backend and Audio Processing Engine}
+The backend handles audio file ingestion and interfaces with the Whisper C++ implementation for efficient processing.
+\subsection{Data Flow and System Integration}
+Transcription history and user metadata are managed through MongoDB, ensuring persistent storage and fast retrieval.
+\subsection{User Authentication and Monitoring}
+RESTful endpoints were designed for file upload status tracking and transcription result polling.
 
-\section{Technology Stack Implementation}
-\begin{itemize}
-    \item \textbf{Frontend:} Next.js 14 (App Router).
-    \item \textbf{Backend:} Node.js/Express.js.
-    \item \textbf{Engine:} OpenAI Whisper.
-    \item \textbf{Database:} MongoDB.
-\end{itemize}
+\section{USSBD Development Workflow}
+\subsection{Introduction to Agile Development}
+Learned the importance of daily stand-ups and iterative development in a professional environment.
+\subsection{Version Control and Collaborative Coding}
+Used Git for branch management and collaborative development on GitHub.
+\subsection{API Documentation and Testing}
+Conducted rigorous testing of RESTful APIs using Postman.
 
-\section{Development Workflow and FFmpeg Integration}
-We utilized FFmpeg for automated audio format normalization, ensuring that all user-uploaded files were converted to a standard format compatible with the Whisper engine.
+\section{Technical Tasks and Implementation}
+\subsection{Audio Processing with FFmpeg}
+Essential for pre-processing various audio formats into the required mono 16kHz WAV format.
+\subsection{Model Deployment with OpenAI Whisper}
+The primary engine used for converting audio to high-accuracy text transcripts.
+\subsection{Additional Development Activities}
+Assisted in UI/UX refinements and database schema optimizations.
+
+\section{Tools and Technologies Used}
+\subsection{Visual Studio Code (IDE)}
+Used as the primary environment for coding and debugging.
+\subsection{Postman (API Testing)}
+Comprehensive API tests were performed to ensure all edge cases in file uploading were handled.
+\subsection{GitHub (Version Control)}
+Used for version control and collaborating with other developers.
+\subsection{MongoDB Compass (Database Management)}
+Used for visualizing and managing the transcription database.
 
 % --- Chapter Four ---
 \printchaptertitle{Technical Challenges and Solutions}
-\section{Audio Processing Hurdles}
-One of the main challenges was handling large audio files and ensuring low-latency transcription. This was solved by optimizing the Whisper C++ CLI implementation and utilizing efficient file streaming.
-
-\section{Security and JWT Implementation}
-Implementing a secure authentication layer required careful handling of tokens and user sessions. We utilized \Gls{jwt} for stateless authentication, ensuring that transcription history remains private to each user.
+\section{Challenges Faced and Solutions}
+\subsection{Large File Upload Handling}
+Solved by implementing chunked uploads and increasing the payload limit on the Express server.
+\subsection{Model Inference Latency}
+Addressed by using the 'tiny' and 'base' models for quick drafts while reserving 'large' for final transcripts.
+\subsection{Audio Format Incompatibility}
+Handled through automated FFmpeg scripts that sanitize incoming audio streams.
+\subsection{Secure Session Management}
+Implemented through \Gls{jwt} and HTTP-only cookies to prevent unauthorized access.
+\subsection{Resource Optimization for Local Deployment}
+Optimized CPU usage by limiting the number of threads used by the Whisper engine during peak loads.
 
 % --- Chapter Five ---
 \printchaptertitle{Professional Development}
 \section{Skills Gained and Learning Outcomes}
 Through this internship, I gained significant expertise in full-stack development, particularly with the Next.js framework and Express.js backend.
 
-\section{Technical Skills Acquired}
-\begin{itemize}
-    \item Proficiency in Next.js App Router and Server Components.
-    \item Experience in building and securing REST \Gls{api}s.
-    \item Knowledge of AI model deployment and CLI integration.
-\end{itemize}
+\sectionsection{Technical Skills Acquired}
+\subsection{Frontend Optimization}
+Mastered the use of Next.js Image optimization and dynamic imports to improve Core Web Vitals.
+\subsection{Backend Security Patterns}
+Learned to implement CORS, rate limiting, and input sanitization to protect the server.
+\subsection{AI Model Integration}
+Gained deep knowledge in deploying and fine-tuning CLI-based AI models for web services.
+\subsection{Database Schema Design}
+Learned to design flexible NoSQL schemas for storing unstructured transcription data.
 
 \section{Professional and Soft Skills}
 I also improved my skills in team collaboration, time management, and technical documentation.
