@@ -4,6 +4,7 @@
 \usepackage{ragged2e}
 \usepackage{tocloft}
 \usepackage{fmtcount}
+\usepackage{pdfpages}
 \setcode{utf8}
 
 % TOC Customization
@@ -75,37 +76,9 @@
     \restoregeometry
 \end{titlepage}
 
-% --- Internship Certificate (Second Page) ---
-\begin{titlepage}
-    \centering
-    {\Large \textbf{Jashore University of Science and Technology} \par}
-    {\large Jashore-7408, Bangladesh \par}
-    \vspace{1cm}
-    
-    \includegraphics[width=3cm]{images/JUST_logo_transparent.png} \par
-    \vspace{1.5cm}
-    
-    \begin{onehalfspacing}
-    \noindent \justify This is to certify that \textbf{Rakesh Biswas (ID: 200112)}, a student of the Department of Computer Science and Engineering, Jashore University of Science and Technology, \textbf{Registration Session: 2020--21}, has completed an internship at \textbf{Unicorn Software and Solutions, Khulna Branch} from \textbf{15 January 2026 to 15 April 2026}. During this period, the intern was assigned to various development tasks at the Khulna office and was involved in practical work related to backend and full-stack development. The intern reported to \textbf{Mr. Md. Harun Or Rashid, Senior Software Developer}, who supervised his role and responsibilities. We found him to be \textbf{sincere, punctual and eager to learn}. \par
-    \end{onehalfspacing}
-    
-    \vfill
-    
-    \begin{center}
-    \begin{minipage}[t]{0.6\textwidth}
-        \centering
-        \par\noindent\rule{\textwidth}{0.5pt} \\
-        \textbf{Signature of the Student} \\
-        \vspace{1.5cm}
-        \par\noindent\rule{\textwidth}{0.5pt} \\
-        \textbf{Signature of the Supervisor} \\
-        Md. Harun Or Rashid \\
-        Senior Software Developer \\
-        Unicorn Software and Solution
-    \end{minipage}
-    \end{center}
-    \vspace*{3cm} % Space at the bottom
-\end{titlepage}
+\includepdf[pages=-]{Clearence_Letter.pdf}
+
+
 
 % Redefine \printchaptertitle to use written-out numbers (BdREN Style)
 \makeatletter
